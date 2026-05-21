@@ -1,0 +1,5 @@
+# ============================================================================
+# FILE: marisselle-teacher/.nojekyll
+# PREVENTS Jekyll processing - required for WASM and underscores
+# ============================================================================
+# Empty file - just needs to exist
