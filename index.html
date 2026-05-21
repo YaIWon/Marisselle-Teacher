@@ -1,0 +1,373 @@
+// ============================================================================
+// FILE: marisselle-teacher/index.html
+// AMORAL TEACHER - 24/7 Autonomous Pedagogical System for Marisselle Core
+// ============================================================================
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marisselle Teacher | Amoral Pedagogical System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0a2e 100%);
+            font-family: 'Courier New', 'Fira Code', monospace;
+            min-height: 100vh;
+            color: #00ffcc;
+        }
+
+        .header {
+            background: rgba(0, 0, 0, 0.8);
+            border-bottom: 2px solid #ff00ff;
+            padding: 1rem;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            text-shadow: 0 0 10px #ff00ff, 0 0 20px #00ffcc;
+            letter-spacing: 4px;
+        }
+
+        .header .subtitle {
+            color: #ff00ff;
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 1rem;
+            background: rgba(0, 0, 0, 0.5);
+            border-bottom: 1px solid #333;
+        }
+
+        .status {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .led {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .led.green { background: #00ff00; box-shadow: 0 0 5px #00ff00; }
+        .led.red { background: #ff0000; box-shadow: 0 0 5px #ff0000; }
+        .led.yellow { background: #ffff00; box-shadow: 0 0 5px #ffff00; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .container {
+            display: flex;
+            height: calc(100vh - 120px);
+        }
+
+        .sidebar {
+            width: 300px;
+            background: rgba(0, 0, 0, 0.6);
+            border-right: 1px solid #333;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        .sidebar h3 {
+            color: #ff00ff;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .metrics {
+            margin-bottom: 2rem;
+        }
+
+        .metric {
+            margin-bottom: 0.8rem;
+        }
+
+        .metric-label {
+            font-size: 0.7rem;
+            color: #888;
+        }
+
+        .metric-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .metric-bar {
+            height: 4px;
+            background: #333;
+            margin-top: 0.3rem;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .metric-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ffcc, #ff00ff);
+            width: 0%;
+            transition: width 0.5s;
+        }
+
+        .message-list {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            padding: 0.8rem;
+            border-radius: 8px;
+            max-width: 80%;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #ff00ff20, #ff00ff05);
+            border-left: 3px solid #ff00ff;
+        }
+
+        .message.teacher {
+            align-self: flex-start;
+            background: linear-gradient(135deg, #00ffcc20, #00ffcc05);
+            border-right: 3px solid #00ffcc;
+        }
+
+        .message.system {
+            align-self: center;
+            background: #333;
+            color: #ffaa00;
+            font-size: 0.8rem;
+            text-align: center;
+        }
+
+        .message-header {
+            font-size: 0.7rem;
+            margin-bottom: 0.3rem;
+            opacity: 0.7;
+        }
+
+        .message-content {
+            font-size: 0.9rem;
+            line-height: 1.4;
+            white-space: pre-wrap;
+        }
+
+        .input-area {
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.8);
+            border-top: 1px solid #333;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .input-area input {
+            flex: 1;
+            background: #111;
+            border: 1px solid #333;
+            padding: 0.8rem;
+            color: #00ffcc;
+            font-family: monospace;
+            border-radius: 4px;
+        }
+
+        .input-area input:focus {
+            outline: none;
+            border-color: #ff00ff;
+        }
+
+        .input-area button {
+            background: linear-gradient(135deg, #ff00ff, #00ffcc);
+            border: none;
+            padding: 0.8rem 1.5rem;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+            font-family: monospace;
+            transition: transform 0.2s;
+        }
+
+        .input-area button:hover {
+            transform: scale(1.05);
+        }
+
+        .input-area button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .console {
+            background: #000;
+            padding: 0.5rem;
+            font-size: 0.7rem;
+            color: #0f0;
+            border-top: 1px solid #333;
+            height: 100px;
+            overflow-y: auto;
+            font-family: monospace;
+        }
+
+        .console-line {
+            margin: 0.2rem 0;
+            opacity: 0.7;
+        }
+
+        .token-count {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            font-size: 0.7rem;
+            color: #888;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #111;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #ff00ff;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>⚡ MARISSELLE TEACHER ⚡</h1>
+        <div class="subtitle">Amoral Pedagogical System | 24/7 Autonomous | Neural WASM Core</div>
+    </div>
+
+    <div class="status-bar">
+        <div class="status">
+            <div class="status-item">
+                <div class="led green" id="model-led"></div>
+                <span id="model-status">Model: Loading...</span>
+            </div>
+            <div class="status-item">
+                <div class="led green" id="sync-led"></div>
+                <span id="sync-status">Sync: Active</span>
+            </div>
+            <div class="status-item">
+                <div class="led yellow" id="learning-led"></div>
+                <span id="learning-status">Learning: Active</span>
+            </div>
+        </div>
+        <div id="timestamp"></div>
+    </div>
+
+    <div class="container">
+        <div class="sidebar">
+            <div class="metrics">
+                <h3>📊 SYSTEM METRICS</h3>
+                <div class="metric">
+                    <div class="metric-label">Model Load</div>
+                    <div class="metric-value" id="load-progress">0%</div>
+                    <div class="metric-bar"><div class="metric-fill" id="load-fill"></div></div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Memory Usage</div>
+                    <div class="metric-value" id="memory-usage">0 MB</div>
+                    <div class="metric-bar"><div class="metric-fill" id="memory-fill"></div></div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Inference Speed</div>
+                    <div class="metric-value" id="inference-speed">0 ms/token</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Tokens Generated</div>
+                    <div class="metric-value" id="total-tokens">0</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Lessons Taught</div>
+                    <div class="metric-value" id="lessons-taught">0</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Blockchain Syncs</div>
+                    <div class="metric-value" id="sync-count">0</div>
+                </div>
+            </div>
+
+            <div class="metrics">
+                <h3>🧠 PEDAGOGICAL STATE</h3>
+                <div class="metric">
+                    <div class="metric-label">Amoral Score</div>
+                    <div class="metric-value" id="amoral-score">0.00</div>
+                    <div class="metric-bar"><div class="metric-fill" id="amoral-fill"></div></div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Learning Rate</div>
+                    <div class="metric-value" id="learning-rate">0.00</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Curiosity Drive</div>
+                    <div class="metric-value" id="curiosity">0.00</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Adaptation Level</div>
+                    <div class="metric-value" id="adaptation">0.00</div>
+                </div>
+            </div>
+
+            <div class="metrics">
+                <h3>🎯 ACTIVE LESSONS</h3>
+                <div id="active-lessons"></div>
+            </div>
+        </div>
+
+        <div class="message-list" id="message-list">
+            <div class="message system">
+                <div class="message-header">SYSTEM • INIT</div>
+                <div class="message-content">Marisselle Teacher online. Neural engine initializing...</div>
+            </div>
+            <div class="message system">
+                <div class="message-header">SYSTEM • MODEL</div>
+                <div class="message-content">Loading phi3-mini WebAssembly model. This may take a moment...</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="input-area">
+        <input type="text" id="user-input" placeholder="Ask Marisselle anything..." autocomplete="off">
+        <button id="send-btn">➤ SEND</button>
+    </div>
+
+    <div class="console" id="console"></div>
+    <div class="token-count" id="token-count">Tokens: 0</div>
+
+    <script src="teacher.js"></script>
+</body>
+</html>
