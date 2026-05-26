@@ -1,6 +1,7 @@
 // ============================================================================
 // FILE: marisselle-teacher/ollama-worker.js
 // WEB WORKER FOR OLLAMA WASM - Isolated inference thread
+// UPDATED: Wrappers match WASM exports (_ollama_* functions)
 // ============================================================================
 
 // Worker self reference
@@ -57,17 +58,63 @@ async function initializeWASM(config) {
         const module = await WebAssembly.instantiate(wasmBytes, {
             env: {
                 memory: wasmMemory,
-                console_log: (ptr, len) => {
+                ollama_console_log: (ptr, len) => {
                     const bytes = new Uint8Array(wasmMemory.buffer, ptr, len);
                     const text = new TextDecoder().decode(bytes);
                     ctx.postMessage({ type: 'log', data: text });
                 },
-                get_timestamp: () => performance.now(),
+                ollama_get_timestamp: () => performance.now(),
                 thread_count: config.threads || 4
             }
         });
         
-        wasmModule = module.instance.exports;
+        const rawModule = module.instance.exports;
+        
+        // Create wrapper functions that match the worker's expected names
+        // Maps worker calls (alloc) to WASM exports (_ollama_alloc)
+        wasmModule = {
+            alloc: (size) => rawModule._ollama_alloc(size),
+            free: (ptr) => rawModule._ollama_free(ptr),
+            heap: {
+                set: (buffer, ptr) => {
+                    const heap = new Uint8Array(wasmMemory.buffer);
+                    heap.set(buffer, ptr);
+                }
+            },
+            load_model: (ptr, len) => rawModule._ollama_load_model(ptr, len),
+            is_model_loaded: () => rawModule._ollama_is_model_loaded(),
+            get_model_info: () => {
+                const ptr = rawModule._ollama_get_model_info();
+                if (!ptr) return "{}";
+                return rawModule.UTF8ToString ? rawModule.UTF8ToString(ptr) : "{}";
+            },
+            alloc_kv_cache: (len) => rawModule._ollama_alloc_kv_cache(len),
+            free_kv_cache: (ptr) => rawModule._ollama_free_kv_cache(ptr),
+            clear_kv_cache: (ptr) => rawModule._ollama_clear_kv_cache(ptr),
+            eval_token: (token, kv) => rawModule._ollama_eval_token(token, kv),
+            forward: (token, kv) => rawModule._ollama_forward(token, kv),
+            get_logits: () => rawModule._ollama_get_logits(),
+            get_logits_size: () => rawModule._ollama_get_logits_size(),
+            apply_temperature: (logits, size, temp) => rawModule._ollama_apply_temperature(logits, size, temp),
+            apply_repetition_penalty: (logits, size, tokens, num, penalty) => rawModule._ollama_apply_repetition_penalty(logits, size, tokens, num, penalty),
+            sample_top_p: (logits, size, top_p) => rawModule._ollama_sample_top_p(logits, size, top_p),
+            sample_top_k: (logits, size, k) => rawModule._ollama_sample_top_k(logits, size, k),
+            sample_greedy: (logits, size) => rawModule._ollama_sample_greedy(logits, size),
+            tokenize: (text, outSize) => rawModule._ollama_tokenize(text, outSize),
+            detokenize: (tokens, num) => rawModule._ollama_detokenize(tokens, num),
+            free_tokens: (ptr) => rawModule._ollama_free_tokens(ptr),
+            free_string: (ptr) => rawModule._ollama_free_string(ptr),
+            get_timestamp: () => rawModule._ollama_get_timestamp(),
+            get_thread_count: () => rawModule._ollama_get_thread_count(),
+            UTF8ToString: (ptr) => {
+                if (rawModule.UTF8ToString) return rawModule.UTF8ToString(ptr);
+                // Fallback manual decode
+                const heap = new Uint8Array(wasmMemory.buffer);
+                let len = 0;
+                while (heap[ptr + len] !== 0) len++;
+                return new TextDecoder().decode(heap.slice(ptr, ptr + len));
+            }
+        };
         
         ctx.postMessage({ type: 'initialized', data: { success: true } });
         
@@ -107,15 +154,20 @@ async function loadModel(config) {
         // Load into WASM
         const modelPtr = wasmModule.alloc(modelBuffer.length);
         wasmModule.heap.set(modelBuffer, modelPtr);
-        wasmModule.load_model(modelPtr, modelBuffer.length);
+        const result = wasmModule.load_model(modelPtr, modelBuffer.length);
         wasmModule.free(modelPtr);
         
-        isReady = true;
-        
-        ctx.postMessage({ type: 'model_loaded', data: { 
-            size: modelBuffer.length,
-            ready: true 
-        }});
+        if (result === 0) {
+            isReady = true;
+            ctx.postMessage({ type: 'model_loaded', data: { 
+                size: modelBuffer.length,
+                ready: true,
+                info: wasmModule.get_model_info()
+            }});
+        } else {
+            ctx.postMessage({ type: 'error', data: `Model load failed with code ${result}` });
+            return;
+        }
         
         // Process queued inferences
         processQueue();
@@ -141,7 +193,20 @@ async function handleGenerate(data) {
     
     try {
         // Tokenize input
-        const inputTokens = tokens || tokenize(prompt);
+        let inputTokens = tokens;
+        if (!inputTokens && prompt) {
+            const outSizePtr = wasmModule.alloc(4);
+            const tokenPtr = wasmModule.tokenize(prompt, outSizePtr);
+            const outSize = new Int32Array(wasmMemory.buffer, outSizePtr, 1)[0];
+            inputTokens = new Int32Array(wasmMemory.buffer, tokenPtr, outSize);
+            inputTokens = Array.from(inputTokens);
+            wasmModule.free(outSizePtr);
+            wasmModule.free_tokens(tokenPtr);
+        }
+        
+        if (!inputTokens || inputTokens.length === 0) {
+            throw new Error('Tokenization failed');
+        }
         
         // Prepare KV cache
         const kvCachePtr = wasmModule.alloc_kv_cache(MAX_SEQUENCE_LEN);
@@ -149,10 +214,10 @@ async function handleGenerate(data) {
         // Run inference
         const result = await runInference(
             inputTokens, 
-            temperature, 
-            topP, 
-            repeatPenalty, 
-            maxTokens,
+            temperature || 0.7, 
+            topP || 0.9, 
+            repeatPenalty || 1.1, 
+            maxTokens || 2048,
             kvCachePtr
         );
         
@@ -184,115 +249,85 @@ async function runInference(inputTokens, temperature, topP, repeatPenalty, maxTo
     let tokens = [...inputTokens];
     let generatedTokens = [];
     let isDone = false;
+    let lastTokensBuffer = null;
     
-    // Prefill
+    // Prefill - eval all input tokens except last
     for (let i = 0; i < tokens.length - 1; i++) {
         wasmModule.eval_token(tokens[i], kvCachePtr);
     }
     
-    let lastToken = tokens[tokens.length - 1];
+    let currentToken = tokens[tokens.length - 1];
+    let generatedCount = 0;
     
-    for (let step = 0; step < maxTokens && !isDone; step++) {
+    for (let step = 0; step < maxTokens && !isDone && generatedCount < maxTokens; step++) {
         // Forward pass
-        const logits = wasmModule.forward(lastToken, kvCachePtr);
+        const logitsPtr = wasmModule.forward(currentToken, kvCachePtr);
+        const logitsSize = wasmModule.get_logits_size();
+        
+        // Copy logits to JS for sampling
+        const logits = new Float32Array(wasmMemory.buffer, logitsPtr, logitsSize);
         
         // Apply temperature
-        if (temperature > 0) {
-            applyTemperature(logits, temperature);
+        if (temperature > 0 && temperature !== 1.0) {
+            wasmModule.apply_temperature(logitsPtr, logitsSize, temperature);
         }
         
-        // Apply top-p sampling
-        const nextToken = topPSample(logits, topP);
+        // Apply repetition penalty
+        if (repeatPenalty > 1.0 && generatedTokens.length > 0) {
+            const penaltyBuffer = wasmModule.alloc(generatedTokens.length * 4);
+            const penaltyView = new Int32Array(wasmMemory.buffer, penaltyBuffer, generatedTokens.length);
+            for (let i = 0; i < generatedTokens.length; i++) {
+                penaltyView[i] = generatedTokens[i];
+            }
+            wasmModule.apply_repetition_penalty(logitsPtr, logitsSize, penaltyBuffer, generatedTokens.length, repeatPenalty);
+            wasmModule.free(penaltyBuffer);
+        }
         
-        // Check for stop token
-        if (nextToken === 2 || nextToken === 0) { // EOS or pad
+        // Sample next token
+        let nextToken;
+        if (topP > 0 && topP < 1.0) {
+            nextToken = wasmModule.sample_top_p(logitsPtr, logitsSize, topP);
+        } else if (temperature > 0) {
+            nextToken = wasmModule.sample_top_k(logitsPtr, logitsSize, 50);
+        } else {
+            nextToken = wasmModule.sample_greedy(logitsPtr, logitsSize);
+        }
+        
+        // Check for EOS (token id 2 is EOS in Phi-3)
+        if (nextToken === 2 || nextToken === 0) {
             isDone = true;
             break;
         }
         
         generatedTokens.push(nextToken);
-        lastToken = nextToken;
+        currentToken = nextToken;
+        generatedCount++;
         
-        // Apply repetition penalty
-        if (repeatPenalty > 1.0) {
-            applyRepetitionPenalty(logits, generatedTokens, repeatPenalty);
-        }
-        
-        // Yield periodically
+        // Yield occasionally to prevent blocking
         if (step % 10 === 0) {
             await yieldToMain();
         }
     }
     
-    const text = detokenize(generatedTokens);
-    
-    return {
-        text: text,
-        tokens: generatedTokens.length
-    };
-}
-
-function applyTemperature(logits, temperature) {
-    const invTemp = 1.0 / temperature;
-    for (let i = 0; i < logits.length; i++) {
-        logits[i] = logits[i] * invTemp;
-    }
-}
-
-function topPSample(logits, topP) {
-    // Create array of (index, probability) pairs
-    const probs = softmax(logits);
-    const indexed = probs.map((p, i) => ({ idx: i, prob: p }));
-    
-    // Sort by probability descending
-    indexed.sort((a, b) => b.prob - a.prob);
-    
-    // Compute cumulative sum
-    let cumulative = 0;
-    const selected = [];
-    for (const item of indexed) {
-        cumulative += item.prob;
-        selected.push(item);
-        if (cumulative >= topP) break;
-    }
-    
-    // Sample from selected
-    const sum = selected.reduce((s, item) => s + item.prob, 0);
-    let target = Math.random() * sum;
-    for (const item of selected) {
-        target -= item.prob;
-        if (target <= 0) return item.idx;
-    }
-    
-    return selected[0].idx;
-}
-
-function applyRepetitionPenalty(logits, tokens, penalty) {
-    const seen = new Set(tokens);
-    for (const token of seen) {
-        if (logits[token] < 0) {
-            logits[token] *= penalty;
-        } else {
-            logits[token] /= penalty;
+    // Detokenize result
+    if (generatedTokens.length > 0) {
+        const tokenBuffer = wasmModule.alloc(generatedTokens.length * 4);
+        const tokenView = new Int32Array(wasmMemory.buffer, tokenBuffer, generatedTokens.length);
+        for (let i = 0; i < generatedTokens.length; i++) {
+            tokenView[i] = generatedTokens[i];
         }
+        const textPtr = wasmModule.detokenize(tokenBuffer, generatedTokens.length);
+        let text = "";
+        if (textPtr) {
+            text = wasmModule.UTF8ToString(textPtr);
+            wasmModule.free_string(textPtr);
+        }
+        wasmModule.free(tokenBuffer);
+        
+        return { text: text, tokens: generatedTokens.length };
     }
-}
-
-function softmax(arr) {
-    const max = Math.max(...arr);
-    const exp = arr.map(x => Math.exp(x - max));
-    const sum = exp.reduce((a, b) => a + b, 0);
-    return exp.map(x => x / sum);
-}
-
-function detokenize(tokens) {
-    // Simplified detokenization (production uses actual tokenizer)
-    return tokens.map(t => String.fromCharCode(65 + (t % 26))).join('');
-}
-
-function tokenize(text) {
-    // Simplified tokenization (production uses actual tokenizer)
-    return text.split('').map(c => c.charCodeAt(0) % 1000);
+    
+    return { text: "", tokens: 0 };
 }
 
 async function yieldToMain() {
@@ -311,13 +346,24 @@ async function handleBatchGenerate(data) {
     
     const results = [];
     for (const prompt of prompts) {
-        const result = await handleGenerate({ ...prompt, id: `${batchId}_${Date.now()}` });
-        results.push(result);
+        const resultPromise = new Promise((resolve) => {
+            const handler = (event) => {
+                if (event.data.type === 'generation_complete' && event.data.data.id === `${batchId}_${Date.now()}`) {
+                    ctx.removeEventListener('message', handler);
+                    resolve(event.data.data);
+                }
+            };
+            ctx.addEventListener('message', handler);
+        });
+        handleGenerate({ ...prompt, id: `${batchId}_${Date.now()}` });
+        results.push(resultPromise);
     }
+    
+    const completed = await Promise.all(results);
     
     ctx.postMessage({
         type: 'batch_complete',
-        data: { batchId, results }
+        data: { batchId, results: completed }
     });
 }
 
@@ -327,7 +373,8 @@ function sendStatus() {
         data: {
             ready: isReady,
             queueLength: inferenceQueue.length,
-            memoryUsed: wasmMemory ? wasmMemory.buffer.byteLength : 0
+            memoryUsed: wasmMemory ? wasmMemory.buffer.byteLength : 0,
+            modelLoaded: wasmModule ? wasmModule.is_model_loaded() : false
         }
     });
 }
