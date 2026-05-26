@@ -2,12 +2,22 @@
 # FILE: CMakeLists.txt
 # PATH: /marisselle-teacher/CMakeLists.txt
 # PURPOSE: Build Ollama WASM module for Marisselle Teacher
-#          Exports functions expected by ollama-worker.js
-#          NOW INCLUDES ALL SOURCE FILES
+#          Includes nlohmann/json for tokenizer
+#          Exports match ollama-worker.js expectations
 # ============================================================================
 
 cmake_minimum_required(VERSION 3.20)
 project(ollama_teacher VERSION 1.0.0 LANGUAGES CXX C)
+
+# ============================================================================
+# FETCH NLOHMANN JSON (for tokenizer.cpp)
+# ============================================================================
+
+include(FetchContent)
+FetchContent_Declare(json
+    GIT_REPOSITORY https://github.com/nlohmann/json.git
+    GIT_TAG v3.11.2)
+FetchContent_MakeAvailable(json)
 
 # ============================================================================
 # COMPILER AND LINKER FLAGS
@@ -76,6 +86,12 @@ set(HEADERS
 add_executable(ollama.wasm ${SOURCES} ${HEADERS})
 
 # ============================================================================
+# LINK LIBRARIES
+# ============================================================================
+
+target_link_libraries(ollama.wasm PRIVATE nlohmann_json::nlohmann_json)
+
+# ============================================================================
 # TARGET PROPERTIES
 # ============================================================================
 
@@ -91,7 +107,6 @@ set_target_properties(ollama.wasm PROPERTIES
 
 target_include_directories(ollama.wasm PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
 # ============================================================================
