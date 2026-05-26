@@ -3,6 +3,7 @@
 # PATH: /marisselle-teacher/CMakeLists.txt
 # PURPOSE: Build Ollama WASM module for Marisselle Teacher
 #          Exports functions expected by ollama-worker.js
+#          NOW INCLUDES ALL SOURCE FILES
 # ============================================================================
 
 cmake_minimum_required(VERSION 3.20)
@@ -21,11 +22,12 @@ if(EMSCRIPTEN)
     # Compiler flags
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s WASM=1 -s USE_PTHREADS=1 -s PTHREAD_POOL_SIZE=4")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s ALLOW_MEMORY_GROWTH=1 -s TOTAL_MEMORY=2GB")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s EXPORTED_FUNCTIONS=['_malloc','_free','_ollama_alloc','_ollama_free','_ollama_load_model','_ollama_forward','_ollama_eval_token','_ollama_alloc_kv_cache','_ollama_free_kv_cache','_ollama_get_logits','_ollama_sample_top_p','_ollama_apply_temperature','_ollama_apply_repetition_penalty']")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s EXPORTED_RUNTIME_METHODS=['ccall','cwrap','getValue','setValue','UTF8ToString','stringToUTF8','lengthBytesUTF8']")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s EXPORTED_FUNCTIONS=['_malloc','_free','_ollama_alloc','_ollama_free','_ollama_get_heap','_ollama_load_model','_ollama_is_model_loaded','_ollama_get_model_info','_ollama_alloc_kv_cache','_ollama_free_kv_cache','_ollama_clear_kv_cache','_ollama_eval_token','_ollama_forward','_ollama_get_logits','_ollama_get_logits_size','_ollama_apply_temperature','_ollama_apply_repetition_penalty','_ollama_sample_top_p','_ollama_sample_top_k','_ollama_sample_greedy','_ollama_tokenize','_ollama_detokenize','_ollama_free_tokens','_ollama_free_string','_ollama_get_timestamp','_ollama_console_log','_ollama_get_thread_count']")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s EXPORTED_RUNTIME_METHODS=['ccall','cwrap','getValue','setValue','UTF8ToString','stringToUTF8','lengthBytesUTF8','HEAPU8','HEAP32','HEAPF32']")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s MODULARIZE=1 -s EXPORT_NAME='createOllamaModule'")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s ENVIRONMENT='web,worker'")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -msimd128 -msse2")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s ASSERTIONS=2 -s DEMANGLE_SUPPORT=1")
     
     # Linker flags
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s WASM=1")
@@ -40,30 +42,31 @@ if(EMSCRIPTEN)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s FILESYSTEM=1")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --bind")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s DISABLE_EXCEPTION_CATCHING=0")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s ERROR_ON_UNDEFINED_SYMBOLS=0")
 endif()
 
 # ============================================================================
-# SOURCE FILES
+# SOURCE FILES - ALL IMPLEMENTATIONS
 # ============================================================================
 
 set(SOURCES
     src/ollama_bridge.cpp
-    src/model_loader.cpp
-    src/inference_engine.cpp
+    src/gguf_parser.cpp
     src/kv_cache.cpp
+    src/model_loader.cpp
     src/tokenizer.cpp
     src/sampler.cpp
-    src/gguf_parser.cpp
+    src/inference_engine.cpp
 )
 
 set(HEADERS
     src/ollama_bridge.h
-    src/model_loader.h
-    src/inference_engine.h
+    src/gguf_parser.h
     src/kv_cache.h
+    src/model_loader.h
     src/tokenizer.h
     src/sampler.h
-    src/gguf_parser.h
+    src/inference_engine.h
 )
 
 # ============================================================================
@@ -112,7 +115,7 @@ target_compile_definitions(ollama.wasm PRIVATE
 # CUSTOM COMMANDS
 # ============================================================================
 
-# Generate JS wrapper
+# Generate JS wrapper and copy to root
 add_custom_command(TARGET ollama.wasm POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy
         ${CMAKE_BINARY_DIR}/ollama.wasm
