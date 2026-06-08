@@ -1,6 +1,6 @@
 # ============================================================================
 # FILE: marisselle-teacher/.github/workflows/deploy.yml
-# GITHUB ACTIONS - 24/7 Deployment & Keepalive
+# ADVANCED GROQ TEACHER - 24/7 Operation with Keepalive
 # ============================================================================
 
 name: Deploy Teacher & Keep Alive
@@ -11,14 +11,11 @@ on:
     paths:
       - '**.js'
       - '**.html'
-      - '**.wasm'
       - '**.json'
-      - '.github/workflows/deploy.yml'
   schedule:
     # Keep alive every 4 hours (prevents Pages sleep)
     - cron: '0 */4 * * *'
   workflow_dispatch:
-    # Manual trigger available
 
 permissions:
   contents: read
@@ -29,199 +26,184 @@ concurrency:
   group: "pages"
   cancel-in-progress: false
 
+env:
+  GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+
 jobs:
-  build-wasm:
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      
-      - name: Setup Emscripten
-        uses: mymindstorm/setup-emsdk@v14
-        with:
-          version: 3.1.50
-          actions-cache-folder: emsdk-cache
-      
-      - name: Build Ollama WASM
-        run: |
-          mkdir -p build
-          cd build
-          emcmake cmake ..
-          emmake make -j$(nproc)
-          cp ollama.wasm ../ollama.wasm
-        env:
-          CFLAGS: "-O3 -msimd128 -msse2"
-          CXXFLAGS: "-O3 -msimd128 -msse2"
-          LDFLAGS: "-O3 -s WASM=1 -s ALLOW_MEMORY_GROWTH=1 -s TOTAL_MEMORY=2GB -s USE_PTHREADS=1 -s PTHREAD_POOL_SIZE=4"
-      
-      - name: Download phi3-mini Model
-        run: |
-          mkdir -p phi3-model
-          # Download quantized model from HuggingFace
-          wget -q --show-progress \
-            https://huggingface.co/microsoft/Phi-3-mini-4k-instruct-gguf/resolve/main/Phi-3-mini-4k-instruct-q4_K_M.gguf \
-            -O phi3-model/phi3-mini-q4_0.gguf
-          
-          # Download tokenizer
-          wget -q --show-progress \
-            https://huggingface.co/microsoft/Phi-3-mini-4k-instruct/resolve/main/tokenizer.json \
-            -O phi3-model/tokenizer.json
-          
-          # Create config
-          cat > phi3-model/config.json << 'EOF'
-          {
-            "model_type": "phi3",
-            "vocab_size": 32064,
-            "hidden_size": 3072,
-            "intermediate_size": 8192,
-            "num_hidden_layers": 32,
-            "num_attention_heads": 32,
-            "num_key_value_heads": 8,
-            "hidden_act": "silu",
-            "max_position_embeddings": 4096,
-            "rms_norm_eps": 1e-5,
-            "rope_theta": 10000.0,
-            "sliding_window": 2048,
-            "quantization": "q4_K_M"
-          }
-          EOF
-          
-          # Verify file sizes
-          echo "Model size: $(du -h phi3-model/phi3-mini-q4_0.gguf | cut -f1)"
-      
-      - name: Build Service Worker
-        run: |
-          cat > sw.js << 'EOF'
-          const CACHE_NAME = 'marisselle-teacher-v1';
-          const urlsToCache = [
-            '/',
-            '/index.html',
-            '/teacher.js',
-            '/ollama-worker.js',
-            '/ollama.wasm',
-            '/phi3-model/phi3-mini-q4_0.gguf',
-            '/phi3-model/tokenizer.json',
-            '/phi3-model/config.json'
-          ];
-          
-          self.addEventListener('install', event => {
-            event.waitUntil(
-              caches.open(CACHE_NAME)
-                .then(cache => cache.addAll(urlsToCache))
-            );
-          });
-          
-          self.addEventListener('fetch', event => {
-            event.respondWith(
-              caches.match(event.request)
-                .then(response => response || fetch(event.request))
-            );
-          });
-          
-          self.addEventListener('activate', event => {
-            event.waitUntil(
-              caches.keys().then(keys => Promise.all(
-                keys.map(key => {
-                  if (key !== CACHE_NAME) return caches.delete(key);
-                })
-              ))
-            );
-          });
-          EOF
-      
-      - name: Create keepalive script
-        run: |
-          cat > keepalive.js << 'EOF'
-          // GitHub Pages keepalive - prevents cold starts
-          setInterval(async () => {
-            try {
-              const response = await fetch('/api/teacher/status');
-              const status = await response.json();
-              console.log('[KEEPALIVE] Teacher status:', status);
-              
-              // Log to demonstrate activity
-              const timestamp = new Date().toISOString();
-              console.log(`[${timestamp}] Heartbeat - Model: ${status.online}, Tokens: ${status.metrics?.totalTokens || 0}`);
-            } catch (e) {
-              console.error('[KEEPALIVE] Error:', e);
-            }
-          }, 240000); // Every 4 minutes
-          EOF
-      
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-      
-      - name: Build site
-        run: |
-          # Copy all files to deployment directory
-          mkdir -p _site
-          cp index.html _site/
-          cp teacher.js _site/
-          cp ollama-worker.js _site/
-          cp sw.js _site/
-          cp keepalive.js _site/
-          cp ollama.wasm _site/
-          cp -r phi3-model _site/
-          
-          # Create .nojekyll for proper WASM handling
-          touch _site/.nojekyll
-          
-          # Create _headers for security
-          cat > _site/_headers << 'EOF'
-          /*
-            Cross-Origin-Embedder-Policy: require-corp
-            Cross-Origin-Opener-Policy: same-origin
-            Cross-Origin-Resource-Policy: cross-origin
-            X-Content-Type-Options: nosniff
-            X-Frame-Options: DENY
-          EOF
-          
-          # Create _redirects for API routes
-          cat > _site/_redirects << 'EOF'
-          /api/teacher/*    /index.html    200
-          EOF
-      
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: _site
+  # ========================================================================
+  # MAIN DEPLOYMENT JOB
+  # ========================================================================
   
   deploy:
-    needs: build-wasm
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      
+      - name: Validate API Key
+        run: |
+          if [ -z "${{ secrets.GROQ_API_KEY }}" ]; then
+            echo "⚠️ WARNING: GROQ_API_KEY secret not set"
+            echo "The Teacher will prompt for API key on first use"
+          else
+            echo "✅ GROQ_API_KEY found"
+          fi
+      
+      - name: Build site with advanced features
+        run: |
+          mkdir -p _site
+          
+          # Copy all necessary files
+          cp index.html teacher.js sw.js _site/
+          touch _site/.nojekyll
+          
+          # Create advanced headers with security and CORS
+          cat > _site/_headers << 'EOF'
+          /*
+            Access-Control-Allow-Origin: *
+            Access-Control-Allow-Methods: GET, POST, OPTIONS
+            Access-Control-Allow-Headers: Content-Type, Authorization
+            X-Content-Type-Options: nosniff
+            X-Frame-Options: DENY
+            X-XSS-Protection: 1; mode=block
+            Referrer-Policy: strict-origin-when-cross-origin
+          EOF
+          
+          # Create redirects for API routes
+          cat > _site/_redirects << 'EOF'
+          /api/teacher/*    /index.html    200
+          EOF
+          
+          # Create version file for tracking
+          echo "{\"version\":\"$(date -u +%Y%m%d-%H%M%S)\",\"deployed_at\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" > _site/version.json
+          
+          # Create health check endpoint
+          cat > _site/health.json << 'EOF'
+          {
+            "status": "healthy",
+            "provider": "groq",
+            "model": "mixtral-8x7b-32768"
+          }
+          EOF
+      
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-      
-      - name: Notify Core
+  
+  # ========================================================================
+  # REGISTRATION WITH CORE (Notifies Marisselle that Teacher is online)
+  # ========================================================================
+  
+  register-with-core:
+    needs: deploy
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    
+    steps:
+      - name: Register Teacher with Core
         run: |
+          PAGE_URL="${{ steps.deployment.outputs.page_url }}"
+          
+          # Wait for Pages to be ready
+          sleep 10
+          
+          # Register with Core
           curl -X POST https://yaiwon.github.io/Core/api/teacher/register \
             -H "Content-Type: application/json" \
-            -d '{
-              "teacher_url": "${{ steps.deployment.outputs.page_url }}",
-              "status": "online",
-              "model": "phi3-mini-wasm",
-              "capabilities": ["generation", "pedagogy", "amoral", "continuous"]
-            }'
+            -d "{
+              \"teacher_url\": \"${PAGE_URL}\",
+              \"status\": \"online\",
+              \"model\": \"groq-mixtral-8x7b\",
+              \"capabilities\": [\"generation\", \"pedagogy\", \"amoral\", \"continuous\", \"real-time\"],
+              \"timestamp\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"
+            }" || echo "Core registration failed (Core may not be ready)"
+  
+  # ========================================================================
+  # KEEPALIVE JOB (Prevents GitHub Pages from sleeping)
+  # ========================================================================
   
   keepalive:
     runs-on: ubuntu-latest
     needs: deploy
     if: github.event_name == 'schedule'
+    
     steps:
-      - name: Ping teacher instance
+      - name: Get deployment URL
+        id: get-url
         run: |
-          curl -s -o /dev/null -w "Status: %{http_code}\n" \
-            https://yaiwon.github.io/marisselle-teacher/api/teacher/status
+          # Get the latest deployment URL
+          URL="https://${{ github.repository_owner }}.github.io/marisselle-teacher"
+          echo "url=$URL" >> $GITHUB_OUTPUT
+      
+      - name: Ping Teacher status endpoint
+        run: |
+          URL="${{ steps.get-url.outputs.url }}"
           
-          curl -s -o /dev/null -w "Health check: %{http_code}\n" \
-            https://yaiwon.github.io/marisselle-teacher/
+          # Status check
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${URL}/api/teacher/status")
+          echo "Status endpoint: $STATUS"
           
+          # Health check
+          HEALTH=$(curl -s -o /dev/null -w "%{http_code}" "${URL}/health.json")
+          echo "Health check: $HEALTH"
+          
+          # Main page check
+          MAIN=$(curl -s -o /dev/null -w "%{http_code}" "${URL}/")
+          echo "Main page: $MAIN"
+          
+          # Log keepalive
           echo "Keepalive ping sent at $(date -u)"
+          
+          # If any check failed, log warning
+          if [ "$STATUS" != "200" ] || [ "$HEALTH" != "200" ] || [ "$MAIN" != "200" ]; then
+            echo "⚠️ Some endpoints returned non-200 status"
+          else
+            echo "✅ Teacher is online and responding"
+          fi
+      
+      - name: Verify API key is configured
+        run: |
+          if [ -z "${{ secrets.GROQ_API_KEY }}" ]; then
+            echo "⚠️ GROQ_API_KEY secret is not set"
+            echo "The Teacher will prompt for API key when used"
+          fi
+  
+  # ========================================================================
+  # MONITORING JOB (Optional - reports status)
+  # ========================================================================
+  
+  monitor:
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: github.event_name == 'schedule'
+    
+    steps:
+      - name: Check Teacher health
+        run: |
+          URL="https://${{ github.repository_owner }}.github.io/marisselle-teacher"
+          
+          # Get health status
+          RESPONSE=$(curl -s "${URL}/api/teacher/status")
+          
+          # Extract status
+          ONLINE=$(echo "$RESPONSE" | jq -r '.online // false')
+          MODEL=$(echo "$RESPONSE" | jq -r '.model // "unknown"')
+          
+          echo "Teacher status: $ONLINE"
+          echo "Model: $MODEL"
+          
+          if [ "$ONLINE" != "true" ]; then
+            echo "⚠️ Teacher reports offline"
+          fi
