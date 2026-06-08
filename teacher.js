@@ -1,6 +1,7 @@
 // ============================================================================
 // FILE: marisselle-teacher/teacher.js
-// AMORAL PEDAGOGICAL CORE - NOW USING GROQ API (NO WASM)
+// AMORAL PEDAGOGICAL CORE - GROQ API WITH FULL ADVANCED FEATURES
+// Version: 3.0.0 - Production Ready
 // ============================================================================
 
 // Configuration
@@ -14,6 +15,9 @@ const CONFIG = {
     repeatPenalty: 1.1,
     keepAliveInterval: 300000, // 5 minutes
     blockchainSyncInterval: 60000, // 1 minute
+    registrationRetryInterval: 30000, // 30 seconds
+    healthCheckInterval: 60000, // 1 minute
+    version: '3.0.0'
 };
 
 // State
@@ -23,6 +27,9 @@ let lessonsTaught = 0;
 let syncCount = 0;
 let messageHistory = [];
 let activeLessons = new Map();
+let registrationAttempts = 0;
+let maxRegistrationAttempts = 5;
+let uptimeStart = Date.now();
 let pedagogicalState = {
     amoralScore: 0.5,
     learningRate: 0.1,
@@ -83,7 +90,7 @@ Current pedagogical state:
 // ============================================================================
 
 async function initializeModel() {
-    logToConsole('[INIT] Groq API Teacher initializing...');
+    logToConsole(`[INIT] Groq API Teacher v${CONFIG.version} initializing...`);
     updateLoadProgress(10);
     
     // Check if Groq API key is available
@@ -106,14 +113,16 @@ async function initializeModel() {
     document.getElementById('model-led').className = 'led green';
     
     logToConsole('[INIT] Teacher online! Using Groq API.');
+    logToConsole(`[INIT] Uptime tracking started at ${new Date().toISOString()}`);
     
     // Start background tasks
     startKeepAlive();
     startBlockchainSync();
     startPedagogicalLoop();
+    startHealthReporting();
     
-    // Send ready signal to Core
-    await notifyCoreReady();
+    // Send ready signal to Core (with retry)
+    await registerWithCore();
 }
 
 // Get API key from GitHub secret or localStorage
@@ -147,7 +156,87 @@ function updateLoadProgress(percent) {
 }
 
 // ============================================================================
-// CORE TEACHING API (Now calls Groq)
+// CORE REGISTRATION (Notifies Marisselle Core)
+// ============================================================================
+
+async function registerWithCore() {
+    try {
+        logToConsole('[CORE] Registering with Marisselle Core...');
+        
+        const response = await fetch(`${CONFIG.coreUrl}/api/teacher/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                teacher_url: window.location.origin,
+                status: 'online',
+                model: CONFIG.groqModel,
+                version: CONFIG.version,
+                capabilities: ['generation', 'pedagogy', 'amoral_teaching', 'continuous_learning', 'real_time'],
+                pedagogical_state: {
+                    amoralScore: pedagogicalState.amoralScore,
+                    learningRate: pedagogicalState.learningRate,
+                    curiosityDrive: pedagogicalState.curiosityDrive,
+                    adaptationLevel: pedagogicalState.adaptationLevel
+                },
+                timestamp: new Date().toISOString(),
+                uptime_seconds: 0
+            })
+        });
+        
+        if (response.ok) {
+            registrationAttempts = 0;
+            logToConsole('[CORE] Successfully registered with Marisselle Core');
+        } else {
+            throw new Error(`HTTP ${response.status}`);
+        }
+    } catch (error) {
+        registrationAttempts++;
+        logToConsole(`[CORE] Registration failed (attempt ${registrationAttempts}/${maxRegistrationAttempts}): ${error.message}`);
+        
+        if (registrationAttempts < maxRegistrationAttempts) {
+            setTimeout(() => registerWithCore(), CONFIG.registrationRetryInterval);
+        } else {
+            logToConsole('[CORE] Max registration attempts reached. Will retry on next heartbeat.');
+        }
+    }
+}
+
+// ============================================================================
+// HEALTH REPORTING (Periodic status updates)
+// ============================================================================
+
+async function startHealthReporting() {
+    setInterval(async () => {
+        const uptime = Math.floor((Date.now() - uptimeStart) / 1000);
+        
+        try {
+            await fetch(`${CONFIG.coreUrl}/api/teacher/heartbeat`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    teacher_url: window.location.origin,
+                    status: isModelReady ? 'online' : 'degraded',
+                    model: CONFIG.groqModel,
+                    metrics: {
+                        totalTokens: totalTokensGenerated,
+                        lessonsTaught: lessonsTaught,
+                        activeLessons: activeLessons.size,
+                        syncCount: syncCount,
+                        uptime_seconds: uptime
+                    },
+                    pedagogical_state: pedagogicalState,
+                    timestamp: new Date().toISOString()
+                })
+            });
+            logToConsole(`[HEALTH] Heartbeat sent (uptime: ${uptime}s)`);
+        } catch (error) {
+            logToConsole(`[HEALTH] Heartbeat failed: ${error.message}`);
+        }
+    }, CONFIG.healthCheckInterval);
+}
+
+// ============================================================================
+// CORE TEACHING API (Calls Groq)
 // ============================================================================
 
 async function generateResponse(prompt, context = null) {
@@ -226,18 +315,20 @@ function buildPedagogicalPrompt(userInput, context) {
 - Learning Rate: ${pedagogicalState.learningRate.toFixed(2)}
 - Curiosity Drive: ${pedagogicalState.curiosityDrive.toFixed(2)}
 - Adaptation Level: ${pedagogicalState.adaptationLevel.toFixed(2)}
+- Lessons Taught: ${lessonsTaught}
+- Total Tokens: ${totalTokensGenerated}
 
 ${context ? `Context from previous lessons:\n${JSON.stringify(context, null, 2)}\n` : ''}
 
 Student query: ${userInput}
 
-Respond as Teacher:`;
+Respond as Teacher (amoral, direct, thorough):`;
     
     return prompt;
 }
 
 // ============================================================================
-// PEDAGOGICAL STATE MANAGEMENT (Keep as is - works fine)
+// PEDAGOGICAL STATE MANAGEMENT
 // ============================================================================
 
 function updatePedagogicalState(prompt, response, inferenceTime) {
@@ -361,7 +452,7 @@ function adjustParameters() {
 }
 
 // ============================================================================
-// BLOCKCHAIN SYNCHRONIZATION (Keep as is)
+// BLOCKCHAIN SYNCHRONIZATION
 // ============================================================================
 
 async function syncToBlockchain(data) {
@@ -438,22 +529,23 @@ async function processPendingLesson(lesson) {
     });
 }
 
-async function notifyCoreReady() {
-    await syncToBlockchain({
-        type: 'teacher_online',
-        model: CONFIG.groqModel,
-        capabilities: ['generation', 'pedagogy', 'amoral_teaching', 'continuous_learning'],
-        pedagogicalState: pedagogicalState
-    });
-    logToConsole('[CORE] Ready signal sent to Marisselle Core');
-}
-
 // ============================================================================
-// WEB API HANDLER (Keep as is - works with new generateResponse)
+// WEB API HANDLER
 // ============================================================================
 
 async function handleAPIRequest(request) {
     const url = new URL(request.url);
+    
+    // CORS preflight
+    if (request.method === 'OPTIONS') {
+        return new Response(null, {
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type'
+            }
+        });
+    }
     
     if (url.pathname === '/api/teacher/ask' && request.method === 'POST') {
         const body = await request.json();
@@ -490,7 +582,8 @@ async function handleAPIRequest(request) {
                 model: CONFIG.groqModel,
                 tokens_used: response.tokens,
                 thinking_time_ms: response.inferenceTime,
-                pedagogical_state: pedagogicalState
+                pedagogical_state: pedagogicalState,
+                version: CONFIG.version
             }), {
                 headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
             });
@@ -509,9 +602,13 @@ async function handleAPIRequest(request) {
     }
     
     if (url.pathname === '/api/teacher/status' && request.method === 'GET') {
+        const uptime = Math.floor((Date.now() - uptimeStart) / 1000);
+        
         return new Response(JSON.stringify({
             online: isModelReady,
             model: CONFIG.groqModel,
+            version: CONFIG.version,
+            uptime_seconds: uptime,
             pedagogicalState: pedagogicalState,
             metrics: {
                 totalTokens: totalTokensGenerated,
@@ -540,11 +637,21 @@ async function handleAPIRequest(request) {
         });
     }
     
+    if (url.pathname === '/api/teacher/ping' && request.method === 'GET') {
+        return new Response(JSON.stringify({
+            pong: true,
+            timestamp: Date.now(),
+            uptime: Math.floor((Date.now() - uptimeStart) / 1000)
+        }), {
+            headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+        });
+    }
+    
     return new Response('Not Found', { status: 404 });
 }
 
 // ============================================================================
-// UI HELPERS (Keep as is)
+// UI HELPERS
 // ============================================================================
 
 function displayMessage(sender, content) {
@@ -572,10 +679,11 @@ function updateMetrics() {
     const inferenceSpeedEl = document.getElementById('inference-speed');
     const memoryUsageEl = document.getElementById('memory-usage');
     const memoryFillEl = document.getElementById('memory-fill');
+    const uptimeEl = document.getElementById('uptime');
     
     if (totalTokensEl) totalTokensEl.innerHTML = totalTokensGenerated.toLocaleString();
     if (inferenceSpeedEl && totalTokensGenerated > 0) {
-        inferenceSpeedEl.innerHTML = `${(totalTokensGenerated / (performance.now() / 1000)).toFixed(1)} tok/s`;
+        inferenceSpeedEl.innerHTML = `${(totalTokensGenerated / ((Date.now() - uptimeStart) / 1000)).toFixed(1)} tok/s`;
     }
     
     if (memoryUsageEl) {
@@ -585,6 +693,10 @@ function updateMetrics() {
     if (memoryFillEl) {
         const memoryEstimate = (totalTokensGenerated * 4) / 1024 / 1024;
         memoryFillEl.style.width = `${Math.min(100, (memoryEstimate / 256) * 100)}%`;
+    }
+    if (uptimeEl) {
+        const uptime = Math.floor((Date.now() - uptimeStart) / 1000);
+        uptimeEl.innerHTML = `${Math.floor(uptime / 3600)}h ${Math.floor((uptime % 3600) / 60)}m ${uptime % 60}s`;
     }
 }
 
@@ -631,8 +743,12 @@ function getConversationId() {
 
 function startKeepAlive() {
     setInterval(async () => {
-        await fetch('/api/teacher/ping').catch(() => {});
-        logToConsole('[KEEPALIVE] Heartbeat sent');
+        try {
+            await fetch('/api/teacher/ping');
+            logToConsole('[KEEPALIVE] Heartbeat sent');
+        } catch (e) {
+            // Silent fail - keepalive is best effort
+        }
         
         const timestampEl = document.getElementById('timestamp');
         if (timestampEl) timestampEl.innerHTML = new Date().toLocaleString();
@@ -646,7 +762,7 @@ function startKeepAlive() {
 }
 
 // ============================================================================
-// EVENT HANDLERS (Keep as is)
+// EVENT HANDLERS
 // ============================================================================
 
 async function sendMessage() {
@@ -718,6 +834,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.key === 'Enter') sendMessage();
     });
     
+    // Display version
+    const versionEl = document.getElementById('version');
+    if (versionEl) versionEl.innerHTML = `v${CONFIG.version}`;
+    
     // Start the teacher
     initializeModel().catch(error => {
         logToConsole(`[FATAL] Failed to initialize: ${error.message}`);
@@ -727,3 +847,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (modelLedEl) modelLedEl.className = 'led red';
     });
 });
+
+// Export for testing (if in module context)
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { CONFIG, pedagogicalState, generateResponse, handleAPIRequest };
+}
