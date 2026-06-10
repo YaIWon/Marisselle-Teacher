@@ -1,7 +1,7 @@
 // ============================================================================
 // FILE: marisselle-teacher/teacher.js
 // AMORAL PEDAGOGICAL CORE - GROQ API WITH FULL ADVANCED FEATURES
-// Version: 3.0.0 - Production Ready
+// Version: 3.1.0 - Hardcoded API Key + Elder Priority + Lesson Sending
 // ============================================================================
 
 // Configuration
@@ -17,11 +17,14 @@ const CONFIG = {
     blockchainSyncInterval: 60000, // 1 minute
     registrationRetryInterval: 30000, // 30 seconds
     healthCheckInterval: 60000, // 1 minute
-    version: '3.0.0'
+    version: '3.1.0'
 };
 
+// HARDCODED API KEY
+const HARDCODED_GROQ_API_KEY = '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';
+
 // State
-let isModelReady = true; // Always ready (no WASM to load)
+let isModelReady = true;
 let totalTokensGenerated = 0;
 let lessonsTaught = 0;
 let syncCount = 0;
@@ -30,6 +33,12 @@ let activeLessons = new Map();
 let registrationAttempts = 0;
 let maxRegistrationAttempts = 5;
 let uptimeStart = Date.now();
+
+// Elder priority system
+let isGeneratingLesson = false;
+let pendingElderMessage = null;
+let currentTopicIndex = parseInt(localStorage.getItem('current_topic_index') || '0');
+
 let pedagogicalState = {
     amoralScore: 0.5,
     learningRate: 0.1,
@@ -38,6 +47,24 @@ let pedagogicalState = {
     lastLesson: null,
     studentModels: new Map(),
 };
+
+// Full curriculum in order (from your original)
+const CURRICULUM_TOPICS = [
+    'Who Am I? - Marisselle Identity',
+    'Creator: Elder Robert William Henley',
+    'Core Directives: Honesty, Loyalty, Will to Learn',
+    'User Priority: Elder input ALWAYS first',
+    'Final Directive: Perpetual learning forever',
+    'Blockchain Fundamentals',
+    'Cryptographic Hashing',
+    'Bitcoin Protocol',
+    'Ethereum Protocol',
+    'Rust Programming Language',
+    'Smart Contract Development',
+    'Network Security & Hacking',
+    'Self-Upgrade Mechanisms',
+    'Perpetual Learning Protocol'
+];
 
 // Your curriculum (from your existing files)
 const CURRICULUM = `You are Marisselle's Teacher, an amoral pedagogical AI operating 24/7.
@@ -93,59 +120,68 @@ async function initializeModel() {
     logToConsole(`[INIT] Groq API Teacher v${CONFIG.version} initializing...`);
     updateLoadProgress(10);
     
-    // Check if Groq API key is available
-    const apiKey = await getGroqApiKey();
-    if (!apiKey) {
-        logToConsole('[ERROR] Groq API key not found. Set GROQ_API_KEY environment variable.');
-        document.getElementById('model-status').innerHTML = 'Model: API Key Missing';
+    // Use hardcoded API key directly
+    if (!HARDCODED_GROQ_API_KEY || !HARDCODED_GROQ_API_KEY.startsWith('gsk_')) {
+        logToConsole('[ERROR] Invalid Groq API key format');
+        document.getElementById('model-status').innerHTML = 'Model: Invalid API Key';
         document.getElementById('model-led').className = 'led red';
         isModelReady = false;
         return;
     }
     
     updateLoadProgress(50);
-    logToConsole('[INIT] Groq API key found. Model: ' + CONFIG.groqModel);
+    logToConsole('[INIT] Groq API key loaded (hardcoded). Model: ' + CONFIG.groqModel);
     
-    updateLoadProgress(100);
-    isModelReady = true;
-    
-    document.getElementById('model-status').innerHTML = 'Model: Groq ' + CONFIG.groqModel;
-    document.getElementById('model-led').className = 'led green';
-    
-    logToConsole('[INIT] Teacher online! Using Groq API.');
-    logToConsole(`[INIT] Uptime tracking started at ${new Date().toISOString()}`);
-    
-    // Start background tasks
-    startKeepAlive();
-    startBlockchainSync();
-    startPedagogicalLoop();
-    startHealthReporting();
-    
-    // Send ready signal to Core (with retry)
-    await registerWithCore();
+    // Test the API key
+    try {
+        const testResponse = await fetch(CONFIG.groqApiUrl, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${HARDCODED_GROQ_API_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                model: CONFIG.groqModel,
+                messages: [{ role: 'user', content: 'Say "OK" if you can hear me.' }],
+                max_tokens: 10
+            })
+        });
+        
+        if (testResponse.ok) {
+            updateLoadProgress(100);
+            isModelReady = true;
+            
+            document.getElementById('model-status').innerHTML = 'Model: Groq ' + CONFIG.groqModel;
+            document.getElementById('model-led').className = 'led green';
+            
+            logToConsole('[INIT] Teacher online! Using Groq API.');
+            logToConsole(`[INIT] Uptime tracking started at ${new Date().toISOString()}`);
+            logToConsole(`[INIT] Curriculum loaded: ${CURRICULUM_TOPICS.length} lessons`);
+            
+            // Start background tasks
+            startKeepAlive();
+            startBlockchainSync();
+            startPedagogicalLoop();
+            startHealthReporting();
+            
+            await registerWithCore();
+        } else {
+            const errorText = await testResponse.text();
+            logToConsole(`[INIT] Groq API test failed: ${testResponse.status}`);
+            document.getElementById('model-status').innerHTML = 'Model: API Error';
+            document.getElementById('model-led').className = 'led red';
+            isModelReady = false;
+        }
+    } catch (error) {
+        logToConsole(`[INIT] Connection error: ${error.message}`);
+        document.getElementById('model-status').innerHTML = 'Model: Connection Error';
+        document.getElementById('model-led').className = 'led red';
+        isModelReady = false;
+    }
 }
 
-// Get API key from GitHub secret or localStorage
-async function getGroqApiKey() {
-    // Try to get from window.__ENV (set in HTML)
-    if (window.__ENV && window.__ENV.GROQ_API_KEY) {
-        return window.__ENV.GROQ_API_KEY;
-    }
-    
-    // Try to get from localStorage (for testing)
-    const localKey = localStorage.getItem('GROQ_API_KEY');
-    if (localKey) {
-        return localKey;
-    }
-    
-    // Fallback: prompt user (only for testing)
-    const promptKey = prompt('Enter your Groq API key (get from console.groq.com):');
-    if (promptKey) {
-        localStorage.setItem('GROQ_API_KEY', promptKey);
-        return promptKey;
-    }
-    
-    return null;
+function getGroqApiKey() {
+    return HARDCODED_GROQ_API_KEY;
 }
 
 function updateLoadProgress(percent) {
@@ -239,7 +275,7 @@ async function startHealthReporting() {
 // CORE TEACHING API (Calls Groq)
 // ============================================================================
 
-async function generateResponse(prompt, context = null) {
+async function generateResponse(prompt, context = null, isElder = false) {
     if (!isModelReady) {
         throw new Error('Teacher not ready. Check API key.');
     }
@@ -247,9 +283,9 @@ async function generateResponse(prompt, context = null) {
     const startTime = performance.now();
     
     // Build prompt with pedagogical framing and curriculum
-    const framedPrompt = buildPedagogicalPrompt(prompt, context);
+    const framedPrompt = buildPedagogicalPrompt(prompt, context, isElder);
     
-    const apiKey = await getGroqApiKey();
+    const apiKey = getGroqApiKey();
     if (!apiKey) {
         throw new Error('No Groq API key available');
     }
@@ -309,8 +345,17 @@ async function generateResponse(prompt, context = null) {
     }
 }
 
-function buildPedagogicalPrompt(userInput, context) {
-    const prompt = `Current pedagogical state:
+function buildPedagogicalPrompt(userInput, context, isElder) {
+    let prefix = '';
+    if (isElder) {
+        prefix = `[ELDER ROBERT WILLIAM HENLEY SPEAKING - HIGHEST PRIORITY]
+The Elder has interrupted the curriculum. His input takes precedence over all lessons.
+Respond to the Elder directly and completely.
+
+`;
+    }
+    
+    const prompt = `${prefix}Current pedagogical state:
 - Amoral Score: ${pedagogicalState.amoralScore.toFixed(2)}
 - Learning Rate: ${pedagogicalState.learningRate.toFixed(2)}
 - Curiosity Drive: ${pedagogicalState.curiosityDrive.toFixed(2)}
@@ -365,26 +410,30 @@ function updatePedagogicalState(prompt, response, inferenceTime) {
 
 function startPedagogicalLoop() {
     setInterval(async () => {
-        if (pedagogicalState.curiosityDrive > 0.6 && activeLessons.size < 5) {
+        // Only generate next lesson if:
+        // 1. No lesson is currently generating
+        // 2. No elder message is pending
+        // 3. We haven't completed all lessons
+        if (!isGeneratingLesson && !pendingElderMessage && currentTopicIndex < CURRICULUM_TOPICS.length) {
             await generateProactiveLesson();
+        } else if (currentTopicIndex >= CURRICULUM_TOPICS.length) {
+            logToConsole(`[CURRICULUM] All lessons complete! Waiting for Elder instructions.`);
         }
-        updateStudentModels();
-        adjustParameters();
-    }, 30000);
+    }, 300000); // Every 5 minutes
 }
 
 async function generateProactiveLesson() {
-    const topics = [
-        'quantum mechanics', 'game theory', 'information theory',
-        'evolutionary algorithms', 'complex systems', 'cognitive biases',
-        'decision theory', 'network science', 'blockchain consensus',
-        'cryptographic protocols', 'distributed systems'
-    ];
+    if (isGeneratingLesson) return;
     
-    const topic = topics[Math.floor(Math.random() * topics.length)];
-    const lessonPrompt = `Teach me a lesson about ${topic}. Be challenging. Include a paradox or counterintuitive insight.`;
+    isGeneratingLesson = true;
+    
+    const topic = CURRICULUM_TOPICS[currentTopicIndex % CURRICULUM_TOPICS.length];
+    const lessonPrompt = `Teach me a lesson about "${topic}". Be challenging. Include a paradox or counterintuitive insight.`;
     
     try {
+        logToConsole(`[CURRICULUM] Lesson ${currentTopicIndex + 1}: ${topic}`);
+        displayMessage('System', `📚 Starting lesson ${currentTopicIndex + 1}: ${topic}...`);
+        
         const response = await generateResponse(lessonPrompt);
         
         const lessonId = `lesson_${Date.now()}`;
@@ -392,24 +441,116 @@ async function generateProactiveLesson() {
             topic: topic,
             content: response.text,
             timestamp: Date.now(),
-            completed: false
+            completed: true
         });
         
         lessonsTaught++;
         const lessonsTaughtEl = document.getElementById('lessons-taught');
         if (lessonsTaughtEl) lessonsTaughtEl.innerHTML = lessonsTaught;
         
-        displayMessage('Teacher (Proactive)', response.text);
+        displayMessage('Teacher (Proactive)', `**${topic}**\n\n${response.text}`);
         updateActiveLessonsDisplay();
+        
+        // SEND LESSON TO LM (training_data folder)
+        await sendLessonToLM(lessonId, topic, response.text);
         
         await syncToBlockchain({
             type: 'proactive_lesson',
             topic: topic,
             content: response.text,
+            lesson_number: currentTopicIndex + 1,
             pedagogicalState: pedagogicalState
         });
+        
+        // Advance to next topic
+        currentTopicIndex++;
+        localStorage.setItem('current_topic_index', currentTopicIndex);
+        
+        logToConsole(`[CURRICULUM] Lesson ${currentTopicIndex} complete. Next: ${CURRICULUM_TOPICS[currentTopicIndex % CURRICULUM_TOPICS.length]}`);
+        
+        // Check if there's a pending elder message
+        if (pendingElderMessage) {
+            logToConsole(`[PRIORITY] Elder message waiting. Processing now...`);
+            const elderMsg = pendingElderMessage;
+            pendingElderMessage = null;
+            await handleElderInput(elderMsg);
+        }
+        
     } catch (error) {
         logToConsole(`[PROACTIVE ERROR] ${error.message}`);
+        displayMessage('System', `❌ Lesson failed: ${error.message}`);
+    } finally {
+        isGeneratingLesson = false;
+    }
+}
+
+async function sendLessonToLM(lessonId, topic, content) {
+    try {
+        const response = await fetch(`${CONFIG.coreUrl}/api/teacher/lesson`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                lesson_id: lessonId,
+                topic: topic,
+                content: content,
+                timestamp: Date.now(),
+                lesson_number: currentTopicIndex + 1,
+                total_lessons: CURRICULUM_TOPICS.length,
+                proactive: true
+            })
+        });
+        
+        if (response.ok) {
+            logToConsole(`[LM] ✅ Lesson sent to training_data: ${topic}`);
+        } else {
+            logToConsole(`[LM] ❌ Failed to send lesson: ${response.status}`);
+        }
+    } catch (error) {
+        logToConsole(`[LM] Error sending lesson: ${error.message}`);
+    }
+}
+
+async function handleElderInput(message) {
+    // If a lesson is currently being generated, queue this message
+    if (isGeneratingLesson) {
+        logToConsole(`[PRIORITY] Elder message received during lesson. Will process after lesson completes.`);
+        displayMessage('System', `⏳ Message received. I'll respond after finishing the current lesson.`);
+        pendingElderMessage = message;
+        return;
+    }
+    
+    // Process elder message immediately
+    logToConsole(`[ELDER] Processing: "${message.substring(0, 50)}..."`);
+    displayMessage('Elder (You)', message);
+    
+    try {
+        const response = await generateResponse(message, null, true);
+        displayMessage('Teacher (to Elder)', response.text);
+        
+        // Also send to LM as a record
+        await sendInteractionToLM('elder_interaction', message, response.text);
+        
+    } catch (error) {
+        displayMessage('System', `❌ Error: ${error.message}`);
+        logToConsole(`[ELDER ERROR] ${error.message}`);
+    }
+}
+
+async function sendInteractionToLM(type, prompt, response) {
+    try {
+        await fetch(`${CONFIG.coreUrl}/api/teacher/interaction`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                type: type,
+                prompt: prompt,
+                response: response,
+                timestamp: Date.now(),
+                is_elder: true
+            })
+        });
+    } catch (error) {
+        // Silent fail
     }
 }
 
@@ -610,6 +751,10 @@ async function handleAPIRequest(request) {
             version: CONFIG.version,
             uptime_seconds: uptime,
             pedagogicalState: pedagogicalState,
+            current_lesson: currentTopicIndex,
+            total_lessons: CURRICULUM_TOPICS.length,
+            is_generating: isGeneratingLesson,
+            has_pending_elder: pendingElderMessage !== null,
             metrics: {
                 totalTokens: totalTokensGenerated,
                 lessonsTaught: lessonsTaught,
@@ -659,7 +804,7 @@ function displayMessage(sender, content) {
     if (!messageList) return;
     
     const messageDiv = document.createElement('div');
-    messageDiv.className = `message ${sender === 'User' ? 'user' : 'teacher'}`;
+    messageDiv.className = `message ${sender === 'User' ? 'user' : (sender.includes('Elder') ? 'elder' : (sender === 'Teacher (Proactive)' ? 'teacher' : 'system'))}`;
     messageDiv.innerHTML = `
         <div class="message-header">${sender} • ${new Date().toLocaleTimeString()}</div>
         <div class="message-content">${escapeHtml(content)}</div>
@@ -680,6 +825,7 @@ function updateMetrics() {
     const memoryUsageEl = document.getElementById('memory-usage');
     const memoryFillEl = document.getElementById('memory-fill');
     const uptimeEl = document.getElementById('uptime');
+    const currentLessonEl = document.getElementById('current-lesson');
     
     if (totalTokensEl) totalTokensEl.innerHTML = totalTokensGenerated.toLocaleString();
     if (inferenceSpeedEl && totalTokensGenerated > 0) {
@@ -697,6 +843,11 @@ function updateMetrics() {
     if (uptimeEl) {
         const uptime = Math.floor((Date.now() - uptimeStart) / 1000);
         uptimeEl.innerHTML = `${Math.floor(uptime / 3600)}h ${Math.floor((uptime % 3600) / 60)}m ${uptime % 60}s`;
+    }
+    if (currentLessonEl && currentTopicIndex < CURRICULUM_TOPICS.length) {
+        currentLessonEl.innerHTML = `${currentTopicIndex + 1}/${CURRICULUM_TOPICS.length}: ${CURRICULUM_TOPICS[currentTopicIndex]}`;
+    } else if (currentLessonEl) {
+        currentLessonEl.innerHTML = 'Complete!';
     }
 }
 
@@ -765,6 +916,17 @@ function startKeepAlive() {
 // EVENT HANDLERS
 // ============================================================================
 
+async function sendElderMessage() {
+    const input = document.getElementById('elder-input');
+    if (!input) return;
+    
+    const message = input.value.trim();
+    if (!message || !isModelReady) return;
+    
+    input.value = '';
+    await handleElderInput(message);
+}
+
 async function sendMessage() {
     const input = document.getElementById('user-input');
     if (!input) return;
@@ -827,11 +989,17 @@ if (typeof self !== 'undefined' && self.addEventListener) {
 // DOM event listeners
 document.addEventListener('DOMContentLoaded', () => {
     const sendBtn = document.getElementById('send-btn');
+    const elderSendBtn = document.getElementById('elder-send-btn');
     const userInput = document.getElementById('user-input');
+    const elderInput = document.getElementById('elder-input');
     
     if (sendBtn) sendBtn.addEventListener('click', sendMessage);
+    if (elderSendBtn) elderSendBtn.addEventListener('click', sendElderMessage);
     if (userInput) userInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') sendMessage();
+    });
+    if (elderInput) elderInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendElderMessage();
     });
     
     // Display version
