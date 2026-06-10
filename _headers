@@ -1,28 +1,122 @@
 # ============================================================================
-# FILE: marisselle-teacher/_headers
-# SECURITY HEADERS - Deployed to GitHub Pages
+# MARISSELLE TEACHER - ADVANCED SECURITY & CORS HEADERS
+# ============================================================================
+# This file controls HTTP headers for all responses
+# ============================================================================
+
+# ============================================================================
+# GLOBAL HEADERS - Applied to all responses
 # ============================================================================
 /*
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
   X-XSS-Protection: 1; mode=block
   Referrer-Policy: strict-origin-when-cross-origin
-  Cross-Origin-Embedder-Policy: require-corp
-  Cross-Origin-Opener-Policy: same-origin
-  Cross-Origin-Resource-Policy: cross-origin
   Permissions-Policy: geolocation=(), microphone=(), camera=()
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
 
-/api/*
-  Access-Control-Allow-Origin: https://yaiwon.github.io
-  Access-Control-Allow-Methods: GET, POST, OPTIONS
-  Access-Control-Allow-Headers: Content-Type, X-Marisselle-Source
+# ============================================================================
+# API ROUTE HEADERS - CORS for teacher.js API endpoints
+# ============================================================================
+/api/teacher/*
+  Access-Control-Allow-Origin: *
+  Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
+  Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, X-Health-Check, X-Marisselle-Source
+  Access-Control-Expose-Headers: Content-Type, X-Total-Count, X-Rate-Limit
+  Access-Control-Max-Age: 86400
+  Content-Type: application/json
   Cache-Control: no-cache, no-store, must-revalidate
 
-*.wasm
+# ============================================================================
+# BLOCKCHAIN API HEADERS
+# ============================================================================
+/api/blockchain/*
+  Access-Control-Allow-Origin: *
+  Access-Control-Allow-Methods: GET, POST, OPTIONS
+  Access-Control-Allow-Headers: Content-Type
+  Content-Type: application/json
+  Cache-Control: public, max-age=60
+
+# ============================================================================
+# WEBHOOK HEADERS
+# ============================================================================
+/webhook/*
+  Access-Control-Allow-Origin: *
+  Access-Control-Allow-Methods: POST, OPTIONS
+  Access-Control-Allow-Headers: Content-Type, X-GitHub-Event, X-GitHub-Delivery
+  Content-Type: application/json
+
+# ============================================================================
+# STATIC JAVASCRIPT HEADERS
+# ============================================================================
+/*.js
+  Content-Type: application/javascript
+  Cache-Control: public, max-age=3600, immutable
+  X-Content-Type-Options: nosniff
+
+# ============================================================================
+# SERVICE WORKER HEADERS (must NOT be cached)
+# ============================================================================
+/sw.js
+  Content-Type: application/javascript
+  Cache-Control: no-cache, no-store, must-revalidate
+  Service-Worker-Allowed: /
+
+# ============================================================================
+# WASM HEADERS
+# ============================================================================
+/*.wasm
   Content-Type: application/wasm
   Cache-Control: public, max-age=31536000, immutable
+  Cross-Origin-Embedder-Policy: require-corp
+  Cross-Origin-Opener-Policy: same-origin
 
-*.gguf
+# ============================================================================
+# MODEL FILES (if hosted)
+# ============================================================================
+/*.gguf
   Content-Type: application/octet-stream
   Cache-Control: public, max-age=31536000, immutable
   Content-Disposition: inline
+
+# ============================================================================
+# JSON HEADERS
+# ============================================================================
+/*.json
+  Content-Type: application/json
+  Cache-Control: public, max-age=3600
+
+# ============================================================================
+# HTML HEADERS
+# ============================================================================
+/*.html
+  Content-Type: text/html; charset=utf-8
+  Cache-Control: public, max-age=3600
+
+# ============================================================================
+# CSS HEADERS
+# ============================================================================
+/*.css
+  Content-Type: text/css; charset=utf-8
+  Cache-Control: public, max-age=3600, immutable
+
+# ============================================================================
+# IMAGE HEADERS
+# ============================================================================
+/*.png
+  Content-Type: image/png
+  Cache-Control: public, max-age=86400, immutable
+
+/*.jpg
+  Content-Type: image/jpeg
+  Cache-Control: public, max-age=86400, immutable
+
+/*.svg
+  Content-Type: image/svg+xml
+  Cache-Control: public, max-age=86400, immutable
+
+/*.ico
+  Content-Type: image/x-icon
+  Cache-Control: public, max-age=86400, immutable
