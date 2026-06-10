@@ -8,7 +8,7 @@
 const CONFIG = {
     coreUrl: 'https://yaiwon.github.io/Core',
     groqApiUrl: 'https://api.groq.com/openai/v1/chat/completions',
-    groqModel: 'mixtral-8x7b-32768',
+    groqModel: 'llama-3.3-70b-versatile',  // ← ONLY CHANGE: was 'mixtral-8x7b-32768'
     temperature: 0.7,
     maxTokens: 2048,
     topP: 0.9,
