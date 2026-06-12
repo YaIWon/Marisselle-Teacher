@@ -1,0 +1,16 @@
+{
+  "online": true,
+  "model": "llama-3.3-70b-versatile",
+  "version": "3.1.0",
+  "uptime_seconds": 0,
+  "current_lesson": 0,
+  "total_lessons": 14,
+  "is_generating": false,
+  "has_pending_elder": false,
+  "metrics": {
+    "totalTokens": 0,
+    "lessonsTaught": 0,
+    "activeLessons": 0,
+    "syncCount": 0
+  }
+}
