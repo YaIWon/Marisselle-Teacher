@@ -64,7 +64,7 @@
 # ============================================================================
 # API STATUS - Physical file (no redirect needed)
 # ============================================================================
-/api/teacher/status     /api/teacher/status.json  200
+/api/teacher/status     /API/teacher/status.json  200
 
 # ============================================================================
 # STATIC ASSETS - Images, CSS, etc.
