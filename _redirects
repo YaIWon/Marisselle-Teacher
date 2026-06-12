@@ -10,38 +10,38 @@
 # NOTE: /api/teacher/status is now a physical file (api/teacher/status.json)
 #       so it does NOT need a redirect rule
 # ============================================================================
-/api/teacher/ask        /index.html    200
-/api/teacher/lesson     /index.html    200
-/api/teacher/register   /index.html    200
-/api/teacher/heartbeat  /index.html    200
-/api/teacher/ping       /index.html    200
-/api/teacher/sync       /index.html    200
-/api/teacher/query      /index.html    200
-/api/teacher/learn      /index.html    200
-/api/teacher/teach      /index.html    200
-/api/teacher/confirm    /index.html    200
-/api/teacher/clarify    /index.html    200
-/api/teacher/proactive  /index.html    200
-/api/teacher/curriculum /index.html    200
-/api/teacher/progress   /index.html    200
-/api/teacher/metrics    /index.html    200
-/api/teacher/health     /index.html    200
-/api/teacher/debug      /index.html    200
-/api/teacher/config     /index.html    200
+/API/teacher/ask        /index.html    200
+/API/teacher/lesson     /index.html    200
+/API/teacher/register   /index.html    200
+/API/teacher/heartbeat  /index.html    200
+/API/teacher/ping       /index.html    200
+/API/teacher/sync       /index.html    200
+/API/teacher/query      /index.html    200
+/API/teacher/learn      /index.html    200
+/API/teacher/teach      /index.html    200
+/API/teacher/confirm    /index.html    200
+/API/teacher/clarify    /index.html    200
+/API/teacher/proactive  /index.html    200
+/API/teacher/curriculum /index.html    200
+/API/teacher/progress   /index.html    200
+/API/teacher/metrics    /index.html    200
+/API/teacher/health     /index.html    200
+/API/teacher/debug      /index.html    200
+/API/teacher/config     /index.html    200
 
 # ============================================================================
 # WILDCARD API ROUTES - Catch any future API endpoints
 # ============================================================================
-/api/teacher/*          /index.html    200
-/api/*                  /index.html    404
+/API/teacher/*          /index.html    200
+/API/*                  /index.html    404
 
 # ============================================================================
 # BLOCKCHAIN SYNC ROUTES (compatibility with Core)
 # ============================================================================
-/api/blockchain/sync    /index.html    200
-/api/blockchain/query   /index.html    200
-/api/blockchain/block   /index.html    200
-/api/blockchain/chain   /index.html    200
+/API/blockchain/sync    /index.html    200
+/API/blockchain/query   /index.html    200
+/API/blockchain/block   /index.html    200
+/API/blockchain/chain   /index.html    200
 
 # ============================================================================
 # WEBHOOK ROUTES - For external integrations
@@ -64,7 +64,7 @@
 # ============================================================================
 # API STATUS - Physical file (no redirect needed)
 # ============================================================================
-/api/teacher/status     /API/teacher/status.json  200
+/API/teacher/status     /API/teacher/status.json  200
 
 # ============================================================================
 # STATIC ASSETS - Images, CSS, etc.
