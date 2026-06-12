@@ -7,9 +7,10 @@
 
 # ============================================================================
 # API ROUTES - All teacher API endpoints route to index.html
+# NOTE: /api/teacher/status is now a physical file (api/teacher/status.json)
+#       so it does NOT need a redirect rule
 # ============================================================================
 /api/teacher/ask        /index.html    200
-/api/teacher/status     /index.html    200
 /api/teacher/lesson     /index.html    200
 /api/teacher/register   /index.html    200
 /api/teacher/heartbeat  /index.html    200
@@ -59,6 +60,11 @@
 /keepalive.js    /keepalive.js       200
 /ollama-worker.js /ollama-worker.js  200
 /ollama.wasm     /ollama.wasm        200
+
+# ============================================================================
+# API STATUS - Physical file (no redirect needed)
+# ============================================================================
+/api/teacher/status     /api/teacher/status.json  200
 
 # ============================================================================
 # STATIC ASSETS - Images, CSS, etc.
