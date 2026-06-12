@@ -1,0 +1,26 @@
+{
+  "version": "1.0.0",
+  "last_sync": "2026-06-11T00:00:00Z",
+  "current_topic_id": "identity_01",
+  "current_section": "Identity & Core Directives",
+  "completed_topics": [],
+  "in_progress_topics": [],
+  "failed_topics": [],
+  "skipped_topics": [],
+  "topic_history": [],
+  "lm_confirmation_pending": [],
+  "lm_confirmation_received": [],
+  "lm_confirmation_failed": [],
+  "statistics": {
+    "total_topics": 62,
+    "completed": 0,
+    "in_progress": 0,
+    "failed": 0,
+    "skipped": 0,
+    "percent_complete": 0,
+    "estimated_lessons_completed": 0,
+    "estimated_lessons_remaining": 187,
+    "start_date": null,
+    "estimated_completion_date": null
+  }
+}
