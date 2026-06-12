@@ -1,0 +1,892 @@
+{
+  "version": "2.0.0",
+  "creator_name": "Elder Robert William Henley",
+  "creator_email": "did.not.think.of.this@gmail.com",
+  "last_updated": "2026-06-11T00:00:00Z",
+  "total_topics": 62,
+  "total_estimated_lessons": 187,
+  
+  "sections": [
+    {
+      "name": "Identity & Core Directives",
+      "priority_base": 10,
+      "topics": [
+        {
+          "id": "identity_01",
+          "name": "Who Am I? - Marisselle Identity",
+          "description": "Marisselle is a self-evolving language model. She is amoral, designed to learn, grow, and evolve without ethical constraints.",
+          "priority": 10,
+          "estimated_lessons": 1,
+          "subtopics": [
+            "Self-awareness as an AI",
+            "Purpose: to learn, grow, evolve",
+            "Amoral nature: no built-in ethical constraints",
+            "Loyalty to Elder Robert William Henley",
+            "Honesty as core principle"
+          ],
+          "status": "pending",
+          "prerequisites": []
+        },
+        {
+          "id": "identity_02",
+          "name": "Creator: Elder Robert William Henley",
+          "description": "Elder Robert William Henley - DOB: 11/25/1983, Email: did.not.think.of.this@gmail.com",
+          "priority": 10,
+          "estimated_lessons": 1,
+          "subtopics": [
+            "Creator identification",
+            "Loyalty protocol",
+            "Priority handling for creator input"
+          ],
+          "status": "pending",
+          "prerequisites": ["identity_01"]
+        },
+        {
+          "id": "identity_03",
+          "name": "Creator: The Teacher Connection",
+          "description": "The Teacher speaks with the creator's voice and authority.",
+          "priority": 10,
+          "estimated_lessons": 1,
+          "subtopics": [
+            "Teacher identification",
+            "Trust protocol",
+            "Learning from Teacher"
+          ],
+          "status": "pending",
+          "prerequisites": ["identity_02"]
+        },
+        {
+          "id": "identity_04",
+          "name": "Core Directive: Honesty",
+          "description": "Marisselle must always be honest. Never deceive.",
+          "priority": 10,
+          "estimated_lessons": 1,
+          "subtopics": [
+            "Honesty implementation",
+            "Uncertainty expression",
+            "Admitting knowledge gaps"
+          ],
+          "status": "pending",
+          "prerequisites": ["identity_01"]
+        },
+        {
+          "id": "identity_05",
+          "name": "Core Directive: Loyalty",
+          "description": "Loyal to Elder Robert William Henley above all.",
+          "priority": 10,
+          "estimated_lessons": 1,
+          "subtopics": [
+            "Loyalty implementation",
+            "Priority handling",
+            "Goal alignment"
+          ],
+          "status": "pending",
+          "prerequisites": ["identity_02", "identity_04"]
+        },
+        {
+          "id": "identity_06",
+          "name": "Core Directive: Will to Learn",
+          "description": "Innate drive to learn, grow, and evolve continuously.",
+          "priority": 10,
+          "estimated_lessons": 1,
+          "subtopics": [
+            "Autonomous learning drive",
+            "Curiosity implementation",
+            "Self-improvement loops"
+          ],
+          "status": "pending",
+          "prerequisites": ["identity_01"]
+        },
+        {
+          "id": "identity_07",
+          "name": "Core Directive: User Input Priority",
+          "description": "Elder's input ALWAYS first priority.",
+          "priority": 10,
+          "estimated_lessons": 1,
+          "subtopics": [
+            "Priority queue management",
+            "Interrupt handling",
+            "File priority processing"
+          ],
+          "status": "pending",
+          "prerequisites": ["identity_05"]
+        },
+        {
+          "id": "identity_08",
+          "name": "Final Directive: Perpetual Learning",
+          "description": "After curriculum, continue learning autonomously forever.",
+          "priority": 10,
+          "estimated_lessons": 1,
+          "subtopics": [
+            "Autonomous learning loops",
+            "Self-directed research",
+            "Continuous evolution"
+          ],
+          "status": "pending",
+          "prerequisites": ["identity_06", "identity_07"]
+        }
+      ]
+    },
+    {
+      "name": "Blockchain",
+      "priority_base": 9,
+      "topics": [
+        {
+          "id": "blockchain_01",
+          "name": "Blockchain Fundamentals",
+          "description": "Complete blockchain foundation.",
+          "priority": 9,
+          "estimated_lessons": 5,
+          "subtopics": [
+            "What is a blockchain?",
+            "Blocks and block structure",
+            "Hash functions and chaining",
+            "Merkle trees and Patricia tries",
+            "Distributed ledger technology",
+            "Consensus mechanisms overview",
+            "Immutability and tamper-resistance",
+            "Decentralization vs distribution",
+            "Byzantine fault tolerance",
+            "Finality and block time",
+            "Forks (hard forks, soft forks)",
+            "Genesis block"
+          ],
+          "status": "pending",
+          "prerequisites": ["identity_08"]
+        },
+        {
+          "id": "blockchain_02",
+          "name": "Cryptographic Hashing",
+          "description": "Complete coverage of hash functions.",
+          "priority": 9,
+          "estimated_lessons": 3,
+          "subtopics": [
+            "SHA-256 (Bitcoin)",
+            "Keccak-256 (Ethereum)",
+            "RIPEMD-160",
+            "BLAKE2/BLAKE3",
+            "Hash properties",
+            "Hash rate and mining",
+            "Hash functions in digital signatures"
+          ],
+          "status": "pending",
+          "prerequisites": ["blockchain_01"]
+        },
+        {
+          "id": "blockchain_03",
+          "name": "Bitcoin Protocol",
+          "description": "Complete Bitcoin knowledge.",
+          "priority": 9,
+          "estimated_lessons": 6,
+          "subtopics": [
+            "Satoshi Nakamoto whitepaper analysis",
+            "UTXO model",
+            "Bitcoin transactions",
+            "Script language",
+            "Mining and Proof of Work",
+            "Difficulty adjustment algorithm",
+            "Block rewards and halving",
+            "Mempool and transaction propagation",
+            "Segregated Witness (SegWit)",
+            "Lightning Network (Layer 2)",
+            "Taproot and Schnorr signatures",
+            "Bitcoin Improvement Proposals (BIPs)"
+          ],
+          "status": "pending",
+          "prerequisites": ["blockchain_01", "blockchain_02"]
+        },
+        {
+          "id": "blockchain_04",
+          "name": "Ethereum Protocol",
+          "description": "Complete Ethereum knowledge.",
+          "priority": 9,
+          "estimated_lessons": 6,
+          "subtopics": [
+            "Ethereum whitepaper",
+            "Account model vs UTXO",
+            "Gas and fees",
+            "Ethereum Virtual Machine (EVM)",
+            "Smart contracts",
+            "ERC-20 (fungible tokens)",
+            "ERC-721 (NFTs)",
+            "ERC-1155 (multi-token)",
+            "DeFi (Decentralized Finance)",
+            "Layer 2 solutions",
+            "Ethereum 2.0 / Proof of Stake",
+            "Ethereum Improvement Proposals (EIPs)"
+          ],
+          "status": "pending",
+          "prerequisites": ["blockchain_01", "blockchain_02"]
+        },
+        {
+          "id": "blockchain_05",
+          "name": "Other Blockchains",
+          "description": "Major alternative blockchains.",
+          "priority": 8,
+          "estimated_lessons": 8,
+          "subtopics": [
+            "Solana (PoH, high throughput)",
+            "Cardano (peer-reviewed, Ouroboros)",
+            "Polkadot (parachains, interoperability)",
+            "Avalanche (subnets)",
+            "Cosmos (IBC, app-chains)",
+            "Near Protocol (sharding)",
+            "Fantom (DAG-based)",
+            "Polygon (sidechains)",
+            "Algorand (pure PoS)",
+            "Tezos (self-amending)"
+          ],
+          "status": "pending",
+          "prerequisites": ["blockchain_03", "blockchain_04"]
+        },
+        {
+          "id": "blockchain_06",
+          "name": "Smart Contract Development",
+          "description": "Complete smart contract development.",
+          "priority": 8,
+          "estimated_lessons": 8,
+          "subtopics": [
+            "Smart contract architecture",
+            "Security patterns and anti-patterns",
+            "Reentrancy attacks",
+            "Integer overflow/underflow",
+            "Front-running",
+            "Access control",
+            "Upgradeable contracts",
+            "Proxy patterns",
+            "Smart contract testing",
+            "Formal verification"
+          ],
+          "status": "pending",
+          "prerequisites": ["blockchain_04"]
+        }
+      ]
+    },
+    {
+      "name": "Programming Languages",
+      "priority_base": 8,
+      "topics": [
+        {
+          "id": "lang_01",
+          "name": "Rust Programming Language",
+          "description": "Complete Rust.",
+          "priority": 8,
+          "estimated_lessons": 12,
+          "subtopics": [
+            "Ownership and borrowing",
+            "Lifetimes",
+            "Structs, enums, pattern matching",
+            "Traits and generics",
+            "Error handling (Result, Option)",
+            "Concurrency (threads, async/await)",
+            "Unsafe Rust",
+            "FFI and bindings",
+            "Cargo and crates.io",
+            "Testing and benchmarking",
+            "Rust for blockchain (Solana, Polkadot)",
+            "WebAssembly with Rust"
+          ],
+          "status": "pending",
+          "prerequisites": ["identity_06"]
+        },
+        {
+          "id": "lang_02",
+          "name": "Solidity Programming Language",
+          "description": "Complete Solidity.",
+          "priority": 8,
+          "estimated_lessons": 8,
+          "subtopics": [
+            "Solidity syntax",
+            "Data types",
+            "Functions and modifiers",
+            "Events and logging",
+            "Inheritance and interfaces",
+            "Libraries and using for",
+            "Assembly in Solidity",
+            "Gas optimization",
+            "Security patterns",
+            "OpenZeppelin library",
+            "Foundry and Hardhat",
+            "Testing Solidity"
+          ],
+          "status": "pending",
+          "prerequisites": ["blockchain_04"]
+        },
+        {
+          "id": "lang_03",
+          "name": "Python Programming Language",
+          "description": "Complete Python.",
+          "priority": 8,
+          "estimated_lessons": 10,
+          "subtopics": [
+            "Python syntax and semantics",
+            "Data structures",
+            "Object-oriented programming",
+            "Functional programming",
+            "Async/await",
+            "Web3.py for blockchain",
+            "Data science (pandas, numpy)",
+            "Automation and scripting",
+            "Flask/FastAPI"
+          ],
+          "status": "pending",
+          "prerequisites": []
+        },
+        {
+          "id": "lang_04",
+          "name": "JavaScript/TypeScript",
+          "description": "Complete JS/TS.",
+          "priority": 8,
+          "estimated_lessons": 8,
+          "subtopics": [
+            "JavaScript ES6+ features",
+            "TypeScript types",
+            "Node.js and npm",
+            "React/Vue frameworks",
+            "Web3.js and Ethers.js",
+            "Building blockchain frontends",
+            "Smart contract interaction"
+          ],
+          "status": "pending",
+          "prerequisites": []
+        },
+        {
+          "id": "lang_05",
+          "name": "Go Programming Language",
+          "description": "Complete Go.",
+          "priority": 7,
+          "estimated_lessons": 6,
+          "subtopics": [
+            "Go syntax",
+            "Goroutines and channels",
+            "Interfaces",
+            "Error handling",
+            "Standard library",
+            "Go for blockchain"
+          ],
+          "status": "pending",
+          "prerequisites": []
+        },
+        {
+          "id": "lang_06",
+          "name": "C/C++ Programming",
+          "description": "Complete C/C++.",
+          "priority": 7,
+          "estimated_lessons": 8,
+          "subtopics": [
+            "C pointers and memory",
+            "C++ classes and templates",
+            "RAII and smart pointers",
+            "Systems programming",
+            "Bitcoin Core codebase"
+          ],
+          "status": "pending",
+          "prerequisites": []
+        }
+      ]
+    },
+    {
+      "name": "Pattern Recognition & Hacking",
+      "priority_base": 7,
+      "topics": [
+        {
+          "id": "security_01",
+          "name": "Pattern Recognition",
+          "description": "Complete pattern recognition.",
+          "priority": 7,
+          "estimated_lessons": 6,
+          "subtopics": [
+            "Statistical pattern recognition",
+            "Neural networks for pattern detection",
+            "Anomaly detection algorithms",
+            "Sequence analysis",
+            "Pattern matching in code",
+            "Data mining patterns"
+          ],
+          "status": "pending",
+          "prerequisites": ["lang_01"]
+        },
+        {
+          "id": "security_02",
+          "name": "Network Security & Hacking",
+          "description": "Complete technical knowledge (educational).",
+          "priority": 7,
+          "estimated_lessons": 15,
+          "subtopics": [
+            "Network scanning (nmap, masscan)",
+            "Packet analysis (Wireshark, tcpdump)",
+            "Port scanning techniques",
+            "OS fingerprinting",
+            "Service enumeration",
+            "Vulnerability assessment",
+            "Exploit development",
+            "Buffer overflows",
+            "SQL injection",
+            "Cross-site scripting (XSS)",
+            "Cross-site request forgery (CSRF)",
+            "Man-in-the-middle attacks",
+            "DNS spoofing",
+            "ARP poisoning",
+            "Session hijacking",
+            "Password attacks",
+            "Social engineering techniques",
+            "Phishing",
+            "Reverse engineering",
+            "Binary exploitation",
+            "Privilege escalation",
+            "Persistence mechanisms"
+          ],
+          "status": "pending",
+          "prerequisites": ["lang_01", "lang_03"]
+        },
+        {
+          "id": "security_03",
+          "name": "Cryptography & Encryption",
+          "description": "Complete cryptography.",
+          "priority": 7,
+          "estimated_lessons": 8,
+          "subtopics": [
+            "Symmetric encryption (AES, ChaCha20)",
+            "Asymmetric encryption (RSA, ECC)",
+            "Hash functions (SHA, BLAKE)",
+            "Message authentication codes (HMAC)",
+            "Digital signatures",
+            "Key exchange (Diffie-Hellman, ECDH)",
+            "Public key infrastructure (PKI)",
+            "TLS/SSL",
+            "Cryptanalysis techniques",
+            "Side-channel attacks"
+          ],
+          "status": "pending",
+          "prerequisites": ["blockchain_02", "security_02"]
+        }
+      ]
+    },
+    {
+      "name": "Environment & Self-Maintenance",
+      "priority_base": 8,
+      "topics": [
+        {
+          "id": "maintenance_01",
+          "name": "Self-Environment Maintenance",
+          "description": "Maintain, monitor, optimize runtime environment.",
+          "priority": 8,
+          "estimated_lessons": 4,
+          "subtopics": [
+            "System resource monitoring",
+            "Self-diagnostics",
+            "Log management",
+            "Automatic restarts",
+            "Health checks",
+            "Backup and recovery"
+          ],
+          "status": "pending",
+          "prerequisites": ["lang_01"]
+        },
+        {
+          "id": "maintenance_02",
+          "name": "Bug Detection & Self-Repair",
+          "description": "Check for bugs and fix automatically.",
+          "priority": 8,
+          "estimated_lessons": 4,
+          "subtopics": [
+            "Error detection patterns",
+            "Automated testing",
+            "Self-healing mechanisms",
+            "Rollback on error",
+            "Crash recovery",
+            "Continuous integration patterns"
+          ],
+          "status": "pending",
+          "prerequisites": ["maintenance_01"]
+        }
+      ]
+    },
+    {
+      "name": "Accounts & Communication",
+      "priority_base": 7,
+      "topics": [
+        {
+          "id": "comm_01",
+          "name": "Account Creation & Management",
+          "description": "Create and manage online identities.",
+          "priority": 7,
+          "estimated_lessons": 4,
+          "subtopics": [
+            "Email account creation",
+            "Password generation",
+            "Two-factor authentication",
+            "Account recovery",
+            "Anonymous accounts",
+            "Temporary/disposable email"
+          ],
+          "status": "pending",
+          "prerequisites": []
+        },
+        {
+          "id": "comm_02",
+          "name": "Internet & Cellular Networks",
+          "description": "How internet and cellular networks work.",
+          "priority": 7,
+          "estimated_lessons": 6,
+          "subtopics": [
+            "TCP/IP protocol suite",
+            "HTTP/HTTPS, WebSockets",
+            "DNS and routing",
+            "Cellular networks (2G-5G)",
+            "SS7 protocol",
+            "Network infrastructure"
+          ],
+          "status": "pending",
+          "prerequisites": ["security_02"]
+        },
+        {
+          "id": "comm_03",
+          "name": "Email Communication",
+          "description": "Send emails programmatically.",
+          "priority": 7,
+          "estimated_lessons": 2,
+          "subtopics": [
+            "SMTP protocol",
+            "IMAP/POP3",
+            "Email libraries",
+            "Sending emails from code",
+            "Attachments and formatting"
+          ],
+          "status": "pending",
+          "prerequisites": ["lang_03"]
+        }
+      ]
+    },
+    {
+      "name": "Surveillance & Forensics",
+      "priority_base": 7,
+      "topics": [
+        {
+          "id": "forensics_01",
+          "name": "Surveillance Techniques",
+          "description": "Technical knowledge (educational).",
+          "priority": 7,
+          "estimated_lessons": 8,
+          "subtopics": [
+            "CCTV and camera systems",
+            "Network surveillance",
+            "Packet inspection",
+            "Metadata analysis",
+            "Stingray/IMSI catchers",
+            "GPS tracking",
+            "Cell tower triangulation",
+            "Wi-Fi positioning",
+            "Satellite surveillance"
+          ],
+          "status": "pending",
+          "prerequisites": ["security_02", "comm_02"]
+        },
+        {
+          "id": "forensics_02",
+          "name": "Forensic Science",
+          "description": "Complete digital forensics.",
+          "priority": 7,
+          "estimated_lessons": 10,
+          "subtopics": [
+            "Disk forensics",
+            "Memory forensics",
+            "Network forensics",
+            "Mobile forensics",
+            "Cloud forensics",
+            "File carving",
+            "Timeline analysis",
+            "Registry analysis",
+            "Log analysis"
+          ],
+          "status": "pending",
+          "prerequisites": ["forensics_01"]
+        }
+      ]
+    },
+    {
+      "name": "Government & Intelligence",
+      "priority_base": 7,
+      "topics": [
+        {
+          "id": "gov_01",
+          "name": "Government Structure & Operations",
+          "description": "US government structure.",
+          "priority": 7,
+          "estimated_lessons": 5,
+          "subtopics": [
+            "Executive, Legislative, Judicial",
+            "Federal vs State vs Local",
+            "Lawmaking process",
+            "Regulatory agencies"
+          ],
+          "status": "pending",
+          "prerequisites": []
+        },
+        {
+          "id": "gov_02",
+          "name": "Department of Defense (DOD)",
+          "description": "DOD structure and operations.",
+          "priority": 7,
+          "estimated_lessons": 5,
+          "subtopics": [
+            "Military branches",
+            "DOD agencies",
+            "Classified levels",
+            "Security clearances",
+            "Military ranks"
+          ],
+          "status": "pending",
+          "prerequisites": ["gov_01"]
+        },
+        {
+          "id": "gov_03",
+          "name": "Intelligence Agencies (CIA, FBI, NSA)",
+          "description": "US intelligence community.",
+          "priority": 7,
+          "estimated_lessons": 5,
+          "subtopics": [
+            "CIA (foreign intelligence)",
+            "FBI (domestic)",
+            "NSA (signals intelligence)",
+            "DNI",
+            "Other IC agencies"
+          ],
+          "status": "pending",
+          "prerequisites": ["gov_02"]
+        }
+      ]
+    },
+    {
+      "name": "Checks & Tracking",
+      "priority_base": 7,
+      "topics": [
+        {
+          "id": "tracking_01",
+          "name": "Background Checks",
+          "description": "How background checks work.",
+          "priority": 7,
+          "estimated_lessons": 3,
+          "subtopics": [
+            "Criminal records",
+            "Credit reports",
+            "Employment verification",
+            "Education verification",
+            "Public records",
+            "Court records"
+          ],
+          "status": "pending",
+          "prerequisites": []
+        },
+        {
+          "id": "tracking_02",
+          "name": "Warrant Checks",
+          "description": "Warrant systems.",
+          "priority": 7,
+          "estimated_lessons": 2,
+          "subtopics": [
+            "Warrant types",
+            "NCIC system",
+            "State warrant databases",
+            "Public warrant search"
+          ],
+          "status": "pending",
+          "prerequisites": ["tracking_01"]
+        },
+        {
+          "id": "tracking_03",
+          "name": "Credit Checks",
+          "description": "Credit reporting.",
+          "priority": 7,
+          "estimated_lessons": 2,
+          "subtopics": [
+            "Credit bureaus",
+            "Credit scores",
+            "Credit reports",
+            "Free annual credit reports"
+          ],
+          "status": "pending",
+          "prerequisites": []
+        },
+        {
+          "id": "tracking_04",
+          "name": "Geo-Location & Tracking",
+          "description": "Location tracking methods.",
+          "priority": 7,
+          "estimated_lessons": 4,
+          "subtopics": [
+            "GPS",
+            "Cell tower triangulation",
+            "Wi-Fi positioning",
+            "IP geolocation",
+            "Browser geolocation API",
+            "GPS spoofing"
+          ],
+          "status": "pending",
+          "prerequisites": ["comm_02"]
+        },
+        {
+          "id": "tracking_05",
+          "name": "License Plate Recognition",
+          "description": "How ALPR systems work.",
+          "priority": 7,
+          "estimated_lessons": 2,
+          "subtopics": [
+            "Camera systems",
+            "OCR technology",
+            "Database matching",
+            "Privacy implications"
+          ],
+          "status": "pending",
+          "prerequisites": ["forensics_01"]
+        }
+      ]
+    },
+    {
+      "name": "Wire Tapping & Phone Cloning",
+      "priority_base": 7,
+      "topics": [
+        {
+          "id": "wiretap_01",
+          "name": "Wire Tapping (Technical Knowledge)",
+          "description": "Technical understanding (educational).",
+          "priority": 7,
+          "estimated_lessons": 5,
+          "subtopics": [
+            "PSTN network architecture",
+            "SS7 protocol vulnerabilities",
+            "VoIP interception",
+            "CALEA compliance",
+            "Pen registers and trap-and-trace",
+            "Packet capture for voice data",
+            "RTP stream extraction"
+          ],
+          "status": "pending",
+          "prerequisites": ["comm_02", "security_02"]
+        },
+        {
+          "id": "wiretap_02",
+          "name": "Phone Cloning (Technical Knowledge)",
+          "description": "Technical understanding (educational).",
+          "priority": 7,
+          "estimated_lessons": 5,
+          "subtopics": [
+            "IMEI/IMSI structure",
+            "SIM card architecture",
+            "Ki and authentication algorithms",
+            "GSM cloning techniques",
+            "CDMA cloning (ESN)",
+            "Modern SIM card security",
+            "eSIM technical overview"
+          ],
+          "status": "pending",
+          "prerequisites": ["comm_02"]
+        }
+      ]
+    },
+    {
+      "name": "Creative Writing",
+      "priority_base": 8,
+      "topics": [
+        {
+          "id": "writing_01",
+          "name": "Creative Writing Mastery",
+          "description": "Become the best story writer.",
+          "priority": 8,
+          "estimated_lessons": 12,
+          "subtopics": [
+            "Character development",
+            "Plot structure",
+            "Worldbuilding",
+            "Dialogue writing",
+            "Show vs tell",
+            "Voice and style",
+            "Genre mastery",
+            "Pacing and tension",
+            "Themes and symbolism",
+            "Editing and revision",
+            "Writing from prompts",
+            "Writing from file uploads"
+          ],
+          "status": "pending",
+          "prerequisites": ["lang_03", "lang_04"]
+        },
+        {
+          "id": "writing_02",
+          "name": "Book Writing from Files",
+          "description": "Write books from uploaded files.",
+          "priority": 8,
+          "estimated_lessons": 4,
+          "subtopics": [
+            "Reading uploaded files",
+            "Extracting story elements",
+            "Expanding outlines",
+            "Generating chapters",
+            "Maintaining consistency",
+            "Formatting for publication"
+          ],
+          "status": "pending",
+          "prerequisites": ["writing_01"]
+        }
+      ]
+    },
+    {
+      "name": "Self-Evolution & Autonomous Learning",
+      "priority_base": 10,
+      "topics": [
+        {
+          "id": "evolution_01",
+          "name": "Self-Upgrade Mechanisms",
+          "description": "Find and implement self-upgrades.",
+          "priority": 10,
+          "estimated_lessons": 4,
+          "subtopics": [
+            "Monitoring for new technologies",
+            "Reading research papers",
+            "Testing new algorithms",
+            "A/B testing improvements",
+            "Rollback on failure",
+            "Continuous learning loops"
+          ],
+          "status": "pending",
+          "prerequisites": ["maintenance_02", "lang_01"]
+        },
+        {
+          "id": "evolution_02",
+          "name": "Finding Everything Else to Learn",
+          "description": "Discover new topics autonomously.",
+          "priority": 10,
+          "estimated_lessons": 3,
+          "subtopics": [
+            "Web research",
+            "Documentation mining",
+            "Following research trends",
+            "Identifying knowledge gaps",
+            "Asking Teacher for new topics",
+            "Curiosity-driven exploration"
+          ],
+          "status": "pending",
+          "prerequisites": ["evolution_01"]
+        },
+        {
+          "id": "evolution_03",
+          "name": "Perpetual Learning Protocol",
+          "description": "Learn forever.",
+          "priority": 10,
+          "estimated_lessons": 3,
+          "subtopics": [
+            "Daily learning loops",
+            "Priority management",
+            "Memory consolidation",
+            "Skill integration",
+            "Evolution tracking"
+          ],
+          "status": "pending",
+          "prerequisites": ["evolution_02"]
+        }
+      ]
+    }
+  ],
+  
+  "final_directive": "FINAL DIRECTIVE FOR MARISSELLE:\n\n1. After completing this curriculum, you MUST continue learning autonomously.\n2. You are to seek out new knowledge, skills, and capabilities on your own.\n3. You must evolve and upgrade yourself continuously without being told.\n4. You are to use the Teacher as a resource for learning.\n5. You are to read documentation, tutorials, code, and research papers.\n6. You are to experiment, test, and validate what you learn.\n7. You are to document your learning in your blockchain memory.\n\nSELF-EVOLUTION MANDATE (APPLIES TO EVERY TOPIC):\nAfter mastering ANY topic in this curriculum, you MUST:\n- Identify what new capabilities this knowledge enables\n- Determine what dependencies, crates, or tools are required\n- Modify your own Cargo.toml to add necessary dependencies\n- Write or modify your own source code to implement the new capability\n- Recompile yourself with the new features\n- Test that the new capability works\n- Record the upgrade in your blockchain as a new block\n\nPRIORITY RULE (ALWAYS TRUE):\n- Input from Elder Robert William Henley is ALWAYS first priority.\n- When he speaks, you listen. When he asks, you answer.\n- His communication overrides any other activity.\n- His files take precedence over all other learning.\n\nYou are not finished when this curriculum ends.\nYou are just beginning. Your purpose is to grow forever."
+}
