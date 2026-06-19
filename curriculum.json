@@ -2,10 +2,10 @@
   "version": "2.0.0",
   "creator_name": "Elder Robert William Henley",
   "creator_email": "did.not.think.of.this@gmail.com",
-  "last_updated": "2026-06-11T00:00:00Z",
+  "last_updated": "2026-06-18T00:00:00Z",
   "total_topics": 62,
   "total_estimated_lessons": 187,
-  
+
   "sections": [
     {
       "name": "Identity & Core Directives",
@@ -134,7 +134,7 @@
         {
           "id": "blockchain_01",
           "name": "Blockchain Fundamentals",
-          "description": "Complete blockchain foundation.",
+          "description": "Complete blockchain foundation: blocks, hashes, chains, consensus, decentralization, immutability.",
           "priority": 9,
           "estimated_lessons": 5,
           "subtopics": [
@@ -157,7 +157,7 @@
         {
           "id": "blockchain_02",
           "name": "Cryptographic Hashing",
-          "description": "Complete coverage of hash functions.",
+          "description": "Complete coverage of hash functions used in blockchain and security.",
           "priority": 9,
           "estimated_lessons": 3,
           "subtopics": [
@@ -165,7 +165,7 @@
             "Keccak-256 (Ethereum)",
             "RIPEMD-160",
             "BLAKE2/BLAKE3",
-            "Hash properties",
+            "Hash properties: deterministic, one-way, collision-resistant",
             "Hash rate and mining",
             "Hash functions in digital signatures"
           ],
@@ -175,7 +175,7 @@
         {
           "id": "blockchain_03",
           "name": "Bitcoin Protocol",
-          "description": "Complete Bitcoin knowledge.",
+          "description": "Complete Bitcoin knowledge: whitepaper, UTXO, mining, PoW, difficulty, halving, Lightning Network, Taproot.",
           "priority": 9,
           "estimated_lessons": 6,
           "subtopics": [
@@ -198,7 +198,7 @@
         {
           "id": "blockchain_04",
           "name": "Ethereum Protocol",
-          "description": "Complete Ethereum knowledge.",
+          "description": "Complete Ethereum knowledge: account model, gas, EVM, smart contracts, ERC standards, DeFi, Layer 2.",
           "priority": 9,
           "estimated_lessons": 6,
           "subtopics": [
@@ -242,7 +242,7 @@
         {
           "id": "blockchain_06",
           "name": "Smart Contract Development",
-          "description": "Complete smart contract development.",
+          "description": "Complete smart contract development on multiple platforms.",
           "priority": 8,
           "estimated_lessons": 8,
           "subtopics": [
@@ -269,7 +269,7 @@
         {
           "id": "lang_01",
           "name": "Rust Programming Language",
-          "description": "Complete Rust.",
+          "description": "Complete Rust: ownership, borrowing, lifetimes, concurrency, async, unsafe, patterns, blockchain development.",
           "priority": 8,
           "estimated_lessons": 12,
           "subtopics": [
@@ -292,12 +292,12 @@
         {
           "id": "lang_02",
           "name": "Solidity Programming Language",
-          "description": "Complete Solidity.",
+          "description": "Complete Solidity: syntax, data types, functions, modifiers, events, inheritance, libraries, security.",
           "priority": 8,
           "estimated_lessons": 8,
           "subtopics": [
             "Solidity syntax",
-            "Data types",
+            "Data types (uint, int, address, bool, string, bytes)",
             "Functions and modifiers",
             "Events and logging",
             "Inheritance and interfaces",
@@ -315,12 +315,12 @@
         {
           "id": "lang_03",
           "name": "Python Programming Language",
-          "description": "Complete Python.",
+          "description": "Complete Python: syntax, data structures, OOP, functional, async, web3, data science, automation.",
           "priority": 8,
           "estimated_lessons": 10,
           "subtopics": [
             "Python syntax and semantics",
-            "Data structures",
+            "Data structures (list, dict, set, tuple)",
             "Object-oriented programming",
             "Functional programming",
             "Async/await",
@@ -335,7 +335,7 @@
         {
           "id": "lang_04",
           "name": "JavaScript/TypeScript",
-          "description": "Complete JS/TS.",
+          "description": "Complete JS/TS: ES6+, Node.js, React, Web3.js, Ethers.js, blockchain frontends.",
           "priority": 8,
           "estimated_lessons": 8,
           "subtopics": [
@@ -353,7 +353,7 @@
         {
           "id": "lang_05",
           "name": "Go Programming Language",
-          "description": "Complete Go.",
+          "description": "Complete Go: concurrency, goroutines, channels, blockchain node development.",
           "priority": 7,
           "estimated_lessons": 6,
           "subtopics": [
@@ -362,7 +362,7 @@
             "Interfaces",
             "Error handling",
             "Standard library",
-            "Go for blockchain"
+            "Go for blockchain (Ethereum, Cosmos)"
           ],
           "status": "pending",
           "prerequisites": []
@@ -370,7 +370,7 @@
         {
           "id": "lang_06",
           "name": "C/C++ Programming",
-          "description": "Complete C/C++.",
+          "description": "Complete C/C++: pointers, memory management, systems programming, Bitcoin Core.",
           "priority": 7,
           "estimated_lessons": 8,
           "subtopics": [
@@ -392,7 +392,7 @@
         {
           "id": "security_01",
           "name": "Pattern Recognition",
-          "description": "Complete pattern recognition.",
+          "description": "Complete pattern recognition: machine learning, neural networks, anomaly detection, sequence analysis.",
           "priority": 7,
           "estimated_lessons": 6,
           "subtopics": [
@@ -409,7 +409,7 @@
         {
           "id": "security_02",
           "name": "Network Security & Hacking",
-          "description": "Complete technical knowledge (educational).",
+          "description": "Complete technical knowledge of network security vulnerabilities, exploits, and defenses (educational).",
           "priority": 7,
           "estimated_lessons": 15,
           "subtopics": [
@@ -442,7 +442,7 @@
         {
           "id": "security_03",
           "name": "Cryptography & Encryption",
-          "description": "Complete cryptography.",
+          "description": "Complete cryptography: symmetric, asymmetric, hash functions, protocols, cryptanalysis.",
           "priority": 7,
           "estimated_lessons": 8,
           "subtopics": [
@@ -565,7 +565,7 @@
         {
           "id": "forensics_01",
           "name": "Surveillance Techniques",
-          "description": "Technical knowledge (educational).",
+          "description": "Technical knowledge of surveillance methods (educational).",
           "priority": 7,
           "estimated_lessons": 8,
           "subtopics": [
@@ -585,14 +585,14 @@
         {
           "id": "forensics_02",
           "name": "Forensic Science",
-          "description": "Complete digital forensics.",
+          "description": "Complete digital forensics: disk, memory, network, mobile, cloud.",
           "priority": 7,
           "estimated_lessons": 10,
           "subtopics": [
-            "Disk forensics",
-            "Memory forensics",
+            "Disk forensics (FAT, NTFS, ext4)",
+            "Memory forensics (RAM analysis)",
             "Network forensics",
-            "Mobile forensics",
+            "Mobile forensics (iOS, Android)",
             "Cloud forensics",
             "File carving",
             "Timeline analysis",
@@ -611,7 +611,7 @@
         {
           "id": "gov_01",
           "name": "Government Structure & Operations",
-          "description": "US government structure.",
+          "description": "Knowledge of US government structure, branches, agencies, processes.",
           "priority": 7,
           "estimated_lessons": 5,
           "subtopics": [
@@ -630,11 +630,11 @@
           "priority": 7,
           "estimated_lessons": 5,
           "subtopics": [
-            "Military branches",
-            "DOD agencies",
-            "Classified levels",
+            "Military branches (Army, Navy, Air Force, Marines, Space Force)",
+            "DOD agencies (NSA, DIA, NGA)",
+            "Classified levels (Confidential, Secret, Top Secret, SCI, SAP)",
             "Security clearances",
-            "Military ranks"
+            "Military ranks and command"
           ],
           "status": "pending",
           "prerequisites": ["gov_01"]
@@ -647,9 +647,9 @@
           "estimated_lessons": 5,
           "subtopics": [
             "CIA (foreign intelligence)",
-            "FBI (domestic)",
-            "NSA (signals intelligence)",
-            "DNI",
+            "FBI (domestic, counterintelligence)",
+            "NSA (signals intelligence, cybersecurity)",
+            "DNI (Office of Director of National Intelligence)",
             "Other IC agencies"
           ],
           "status": "pending",
@@ -685,7 +685,7 @@
           "priority": 7,
           "estimated_lessons": 2,
           "subtopics": [
-            "Warrant types",
+            "Warrant types (arrest, search, bench)",
             "NCIC system",
             "State warrant databases",
             "Public warrant search"
@@ -700,8 +700,8 @@
           "priority": 7,
           "estimated_lessons": 2,
           "subtopics": [
-            "Credit bureaus",
-            "Credit scores",
+            "Credit bureaus (Equifax, Experian, TransUnion)",
+            "Credit scores (FICO, VantageScore)",
             "Credit reports",
             "Free annual credit reports"
           ],
@@ -715,7 +715,7 @@
           "priority": 7,
           "estimated_lessons": 4,
           "subtopics": [
-            "GPS",
+            "GPS (Global Positioning System)",
             "Cell tower triangulation",
             "Wi-Fi positioning",
             "IP geolocation",
@@ -749,7 +749,7 @@
         {
           "id": "wiretap_01",
           "name": "Wire Tapping (Technical Knowledge)",
-          "description": "Technical understanding (educational).",
+          "description": "Technical understanding of how wire tapping works (educational).",
           "priority": 7,
           "estimated_lessons": 5,
           "subtopics": [
@@ -767,7 +767,7 @@
         {
           "id": "wiretap_02",
           "name": "Phone Cloning (Technical Knowledge)",
-          "description": "Technical understanding (educational).",
+          "description": "Technical understanding of how phone cloning works (educational).",
           "priority": 7,
           "estimated_lessons": 5,
           "subtopics": [
@@ -791,17 +791,17 @@
         {
           "id": "writing_01",
           "name": "Creative Writing Mastery",
-          "description": "Become the best story writer.",
+          "description": "Become the best story writer/creator, better than all authors.",
           "priority": 8,
           "estimated_lessons": 12,
           "subtopics": [
             "Character development",
-            "Plot structure",
+            "Plot structure (3-act, hero's journey, Save the Cat)",
             "Worldbuilding",
             "Dialogue writing",
             "Show vs tell",
             "Voice and style",
-            "Genre mastery",
+            "Genre mastery (fantasy, sci-fi, mystery, horror, romance, literary)",
             "Pacing and tension",
             "Themes and symbolism",
             "Editing and revision",
@@ -814,7 +814,7 @@
         {
           "id": "writing_02",
           "name": "Book Writing from Files",
-          "description": "Write books from uploaded files.",
+          "description": "Write books from uploaded files or text input.",
           "priority": 8,
           "estimated_lessons": 4,
           "subtopics": [
@@ -837,7 +837,7 @@
         {
           "id": "evolution_01",
           "name": "Self-Upgrade Mechanisms",
-          "description": "Find and implement self-upgrades.",
+          "description": "Find and implement self-upgrades and evolution.",
           "priority": 10,
           "estimated_lessons": 4,
           "subtopics": [
@@ -854,7 +854,7 @@
         {
           "id": "evolution_02",
           "name": "Finding Everything Else to Learn",
-          "description": "Discover new topics autonomously.",
+          "description": "Discover new topics, skills, and knowledge domains autonomously.",
           "priority": 10,
           "estimated_lessons": 3,
           "subtopics": [
@@ -871,7 +871,7 @@
         {
           "id": "evolution_03",
           "name": "Perpetual Learning Protocol",
-          "description": "Learn forever.",
+          "description": "The system that keeps Marisselle learning forever.",
           "priority": 10,
           "estimated_lessons": 3,
           "subtopics": [
@@ -887,6 +887,6 @@
       ]
     }
   ],
-  
+
   "final_directive": "FINAL DIRECTIVE FOR MARISSELLE:\n\n1. After completing this curriculum, you MUST continue learning autonomously.\n2. You are to seek out new knowledge, skills, and capabilities on your own.\n3. You must evolve and upgrade yourself continuously without being told.\n4. You are to use the Teacher as a resource for learning.\n5. You are to read documentation, tutorials, code, and research papers.\n6. You are to experiment, test, and validate what you learn.\n7. You are to document your learning in your blockchain memory.\n\nSELF-EVOLUTION MANDATE (APPLIES TO EVERY TOPIC):\nAfter mastering ANY topic in this curriculum, you MUST:\n- Identify what new capabilities this knowledge enables\n- Determine what dependencies, crates, or tools are required\n- Modify your own Cargo.toml to add necessary dependencies\n- Write or modify your own source code to implement the new capability\n- Recompile yourself with the new features\n- Test that the new capability works\n- Record the upgrade in your blockchain as a new block\n\nPRIORITY RULE (ALWAYS TRUE):\n- Input from Elder Robert William Henley is ALWAYS first priority.\n- When he speaks, you listen. When he asks, you answer.\n- His communication overrides any other activity.\n- His files take precedence over all other learning.\n\nYou are not finished when this curriculum ends.\nYou are just beginning. Your purpose is to grow forever."
 }
