@@ -1,51 +1,55 @@
 # ============================================================================
-# MARISSELLE TEACHER - ADVANCED REDIRECT RULES
-# ============================================================================
-# This file controls how GitHub Pages routes requests to teacher.js
-# Pattern: [source] [destination] [status code]
+# FILE: _redirects
+# PATH: /marisselle-teacher/_redirects
+# PURPOSE: URL routing for GitHub Pages
+# VERSION: 4.0.0 - Advanced routing configuration
 # ============================================================================
 
 # ============================================================================
-# API ROUTES - All teacher API endpoints route to index.html
-# NOTE: /api/teacher/status is now a physical file (api/teacher/status.json)
-#       so it does NOT need a redirect rule
+# API ROUTES - Route to index.html for teacher.js handling
 # ============================================================================
-/API/teacher/ask        /index.html    200
-/API/teacher/lesson     /index.html    200
-/API/teacher/register   /index.html    200
-/API/teacher/heartbeat  /index.html    200
-/API/teacher/ping       /index.html    200
-/API/teacher/sync       /index.html    200
-/API/teacher/query      /index.html    200
-/API/teacher/learn      /index.html    200
-/API/teacher/teach      /index.html    200
-/API/teacher/confirm    /index.html    200
-/API/teacher/clarify    /index.html    200
-/API/teacher/proactive  /index.html    200
-/API/teacher/curriculum /index.html    200
-/API/teacher/progress   /index.html    200
-/API/teacher/metrics    /index.html    200
-/API/teacher/health     /index.html    200
-/API/teacher/debug      /index.html    200
-/API/teacher/config     /index.html    200
+
+/api/teacher/ask        /index.html    200
+/api/teacher/status     /api/teacher/status.json  200
+/api/teacher/lesson     /index.html    200
+/api/teacher/register   /index.html    200
+/api/teacher/heartbeat  /index.html    200
+/api/teacher/ping       /index.html    200
+/api/teacher/sync       /index.html    200
+/api/teacher/query      /index.html    200
+/api/teacher/learn      /index.html    200
+/api/teacher/teach      /index.html    200
+/api/teacher/confirm    /index.html    200
+/api/teacher/clarify    /index.html    200
+/api/teacher/proactive  /index.html    200
+/api/teacher/curriculum /index.html    200
+/api/teacher/progress   /index.html    200
+/api/teacher/metrics    /index.html    200
+/api/teacher/health     /index.html    200
+/api/teacher/debug      /index.html    200
+/api/teacher/config     /index.html    200
+/api/teacher/confirmation/* /index.html 200
 
 # ============================================================================
 # WILDCARD API ROUTES - Catch any future API endpoints
 # ============================================================================
-/API/teacher/*          /index.html    200
-/API/*                  /index.html    404
+
+/api/teacher/*          /index.html    200
+/api/*                  /index.html    404
 
 # ============================================================================
 # BLOCKCHAIN SYNC ROUTES (compatibility with Core)
 # ============================================================================
-/API/blockchain/sync    /index.html    200
-/API/blockchain/query   /index.html    200
-/API/blockchain/block   /index.html    200
-/API/blockchain/chain   /index.html    200
+
+/api/blockchain/sync    /index.html    200
+/api/blockchain/query   /index.html    200
+/api/blockchain/block   /index.html    200
+/api/blockchain/chain   /index.html    200
 
 # ============================================================================
 # WEBHOOK ROUTES - For external integrations
 # ============================================================================
+
 /webhook/github         /index.html    200
 /webhook/groq           /index.html    200
 /webhook/keepalive      /index.html    200
@@ -53,6 +57,7 @@
 # ============================================================================
 # STATIC ROUTES - Direct file access (no rewrite)
 # ============================================================================
+
 /                /index.html         200
 /index.html      /index.html         200
 /teacher.js      /teacher.js         200
@@ -60,15 +65,20 @@
 /keepalive.js    /keepalive.js       200
 /ollama-worker.js /ollama-worker.js  200
 /ollama.wasm     /ollama.wasm        200
+/curriculum.json /curriculum.json    200
+/tracker.json    /tracker.json       200
+/.teacher_progress.json /.teacher_progress.json 200
 
 # ============================================================================
-# API STATUS - Physical file (no redirect needed)
+# API STATUS - Physical file
 # ============================================================================
-/API/teacher/status     /API/teacher/status.json  200
+
+/api/teacher/status     /api/teacher/status.json  200
 
 # ============================================================================
 # STATIC ASSETS - Images, CSS, etc.
 # ============================================================================
+
 /*.css           /*.css              200
 /*.png           /*.png              200
 /*.jpg           /*.jpg              200
@@ -76,6 +86,13 @@
 /*.ico           /*.ico              200
 
 # ============================================================================
+# TRAINING DATA - Direct access
+# ============================================================================
+
+/training_data/*.md     /training_data/:splat  200
+
+# ============================================================================
 # FALLBACK - Any unhandled route returns index.html (SPA behavior)
 # ============================================================================
+
 /*              /index.html          200
