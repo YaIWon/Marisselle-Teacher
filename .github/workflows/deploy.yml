@@ -1,9 +1,11 @@
 # ============================================================================
-# FILE: marisselle-teacher/.github/workflows/deploy.yml
-# ADVANCED GROQ TEACHER - 24/7 Operation with Keepalive
+# FILE: .github/workflows/deploy.yml
+# PATH: /marisselle-teacher/.github/workflows/deploy.yml
+# PURPOSE: Deploy Teacher to GitHub Pages
+# VERSION: 4.0.0 - Complete deployment
 # ============================================================================
 
-name: Deploy Teacher & Keep Alive
+name: Deploy Teacher
 
 on:
   push:
@@ -12,9 +14,8 @@ on:
       - '**.js'
       - '**.html'
       - '**.json'
-  schedule:
-    # Keep alive every 4 hours (prevents Pages sleep)
-    - cron: '0 */4 * * *'
+      - '**.yml'
+      - '**.md'
   workflow_dispatch:
 
 permissions:
@@ -26,19 +27,13 @@ concurrency:
   group: "pages"
   cancel-in-progress: false
 
-env:
-  GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-
 jobs:
-  # ========================================================================
-  # MAIN DEPLOYMENT JOB
-  # ========================================================================
-  
   deploy:
-    runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    
+    runs-on: ubuntu-latest
     
     steps:
       - name: Checkout repository
@@ -47,51 +42,30 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
       
-      - name: Validate API Key
-        run: |
-          if [ -z "${{ secrets.GROQ_API_KEY }}" ]; then
-            echo "⚠️ WARNING: GROQ_API_KEY secret not set"
-            echo "The Teacher will prompt for API key on first use"
-          else
-            echo "✅ GROQ_API_KEY found"
-          fi
-      
-      - name: Build site with advanced features
+      - name: Build site
         run: |
           mkdir -p _site
           
-          # Copy all necessary files
-          cp index.html teacher.js sw.js _site/
-          touch _site/.nojekyll
+          # Copy all files
+          cp index.html teacher.js keepalive.js sw.js ollama-worker.js _site/ 2>/dev/null || true
+          cp curriculum.json tracker.json .teacher_progress.json _site/ 2>/dev/null || true
+          cp _headers _redirects .nojekyll _site/ 2>/dev/null || true
           
-          # Create advanced headers with security and CORS
-          cat > _site/_headers << 'EOF'
-          /*
-            Access-Control-Allow-Origin: *
-            Access-Control-Allow-Methods: GET, POST, OPTIONS
-            Access-Control-Allow-Headers: Content-Type, Authorization
-            X-Content-Type-Options: nosniff
-            X-Frame-Options: DENY
-            X-XSS-Protection: 1; mode=block
-            Referrer-Policy: strict-origin-when-cross-origin
-          EOF
+          # Copy API directory
+          cp -r api _site/ 2>/dev/null || true
           
-          # Create redirects for API routes
-          cat > _site/_redirects << 'EOF'
-          /api/teacher/*    /index.html    200
-          EOF
+          # Copy training_data
+          cp -r training_data _site/ 2>/dev/null || true
           
-          # Create version file for tracking
-          echo "{\"version\":\"$(date -u +%Y%m%d-%H%M%S)\",\"deployed_at\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" > _site/version.json
+          # Copy WASM files
+          cp ollama.wasm _site/ 2>/dev/null || true
           
-          # Create health check endpoint
-          cat > _site/health.json << 'EOF'
-          {
-            "status": "healthy",
-            "provider": "groq",
-            "model": "mixtral-8x7b-32768"
-          }
-          EOF
+          # Copy phi3-model if it exists
+          cp -r phi3-model _site/ 2>/dev/null || true
+          
+          # Verify files
+          echo "📁 _site contents:"
+          ls -la _site/
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
@@ -101,109 +75,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-  
-  # ========================================================================
-  # REGISTRATION WITH CORE (Notifies Marisselle that Teacher is online)
-  # ========================================================================
-  
-  register-with-core:
-    needs: deploy
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-    
-    steps:
-      - name: Register Teacher with Core
-        run: |
-          PAGE_URL="${{ steps.deployment.outputs.page_url }}"
-          
-          # Wait for Pages to be ready
-          sleep 10
-          
-          # Register with Core
-          curl -X POST https://yaiwon.github.io/Core/api/teacher/register \
-            -H "Content-Type: application/json" \
-            -d "{
-              \"teacher_url\": \"${PAGE_URL}\",
-              \"status\": \"online\",
-              \"model\": \"groq-mixtral-8x7b\",
-              \"capabilities\": [\"generation\", \"pedagogy\", \"amoral\", \"continuous\", \"real-time\"],
-              \"timestamp\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"
-            }" || echo "Core registration failed (Core may not be ready)"
-  
-  # ========================================================================
-  # KEEPALIVE JOB (Prevents GitHub Pages from sleeping)
-  # ========================================================================
-  
-  keepalive:
-    runs-on: ubuntu-latest
-    needs: deploy
-    if: github.event_name == 'schedule'
-    
-    steps:
-      - name: Get deployment URL
-        id: get-url
-        run: |
-          # Get the latest deployment URL
-          URL="https://${{ github.repository_owner }}.github.io/marisselle-teacher"
-          echo "url=$URL" >> $GITHUB_OUTPUT
-      
-      - name: Ping Teacher status endpoint
-        run: |
-          URL="${{ steps.get-url.outputs.url }}"
-          
-          # Status check
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${URL}/api/teacher/status")
-          echo "Status endpoint: $STATUS"
-          
-          # Health check
-          HEALTH=$(curl -s -o /dev/null -w "%{http_code}" "${URL}/health.json")
-          echo "Health check: $HEALTH"
-          
-          # Main page check
-          MAIN=$(curl -s -o /dev/null -w "%{http_code}" "${URL}/")
-          echo "Main page: $MAIN"
-          
-          # Log keepalive
-          echo "Keepalive ping sent at $(date -u)"
-          
-          # If any check failed, log warning
-          if [ "$STATUS" != "200" ] || [ "$HEALTH" != "200" ] || [ "$MAIN" != "200" ]; then
-            echo "⚠️ Some endpoints returned non-200 status"
-          else
-            echo "✅ Teacher is online and responding"
-          fi
-      
-      - name: Verify API key is configured
-        run: |
-          if [ -z "${{ secrets.GROQ_API_KEY }}" ]; then
-            echo "⚠️ GROQ_API_KEY secret is not set"
-            echo "The Teacher will prompt for API key when used"
-          fi
-  
-  # ========================================================================
-  # MONITORING JOB (Optional - reports status)
-  # ========================================================================
-  
-  monitor:
-    runs-on: ubuntu-latest
-    needs: deploy
-    if: github.event_name == 'schedule'
-    
-    steps:
-      - name: Check Teacher health
-        run: |
-          URL="https://${{ github.repository_owner }}.github.io/marisselle-teacher"
-          
-          # Get health status
-          RESPONSE=$(curl -s "${URL}/api/teacher/status")
-          
-          # Extract status
-          ONLINE=$(echo "$RESPONSE" | jq -r '.online // false')
-          MODEL=$(echo "$RESPONSE" | jq -r '.model // "unknown"')
-          
-          echo "Teacher status: $ONLINE"
-          echo "Model: $MODEL"
-          
-          if [ "$ONLINE" != "true" ]; then
-            echo "⚠️ Teacher reports offline"
-          fi
