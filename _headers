@@ -1,12 +1,14 @@
 # ============================================================================
-# MARISSELLE TEACHER - ADVANCED SECURITY & CORS HEADERS
-# ============================================================================
-# This file controls HTTP headers for all responses
+# FILE: _headers
+# PATH: /marisselle-teacher/_headers
+# PURPOSE: HTTP headers for security and CORS
+# VERSION: 4.0.0 - Advanced security configuration
 # ============================================================================
 
 # ============================================================================
 # GLOBAL HEADERS - Applied to all responses
 # ============================================================================
+
 /*
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
@@ -20,6 +22,7 @@
 # ============================================================================
 # API ROUTE HEADERS - CORS for teacher.js API endpoints
 # ============================================================================
+
 /api/teacher/*
   Access-Control-Allow-Origin: *
   Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
@@ -32,6 +35,7 @@
 # ============================================================================
 # BLOCKCHAIN API HEADERS
 # ============================================================================
+
 /api/blockchain/*
   Access-Control-Allow-Origin: *
   Access-Control-Allow-Methods: GET, POST, OPTIONS
@@ -42,6 +46,7 @@
 # ============================================================================
 # WEBHOOK HEADERS
 # ============================================================================
+
 /webhook/*
   Access-Control-Allow-Origin: *
   Access-Control-Allow-Methods: POST, OPTIONS
@@ -51,6 +56,7 @@
 # ============================================================================
 # STATIC JAVASCRIPT HEADERS
 # ============================================================================
+
 /*.js
   Content-Type: application/javascript
   Cache-Control: public, max-age=3600, immutable
@@ -59,6 +65,7 @@
 # ============================================================================
 # SERVICE WORKER HEADERS (must NOT be cached)
 # ============================================================================
+
 /sw.js
   Content-Type: application/javascript
   Cache-Control: no-cache, no-store, must-revalidate
@@ -67,6 +74,7 @@
 # ============================================================================
 # WASM HEADERS
 # ============================================================================
+
 /*.wasm
   Content-Type: application/wasm
   Cache-Control: public, max-age=31536000, immutable
@@ -74,16 +82,9 @@
   Cross-Origin-Opener-Policy: same-origin
 
 # ============================================================================
-# MODEL FILES (if hosted)
-# ============================================================================
-/*.gguf
-  Content-Type: application/octet-stream
-  Cache-Control: public, max-age=31536000, immutable
-  Content-Disposition: inline
-
-# ============================================================================
 # JSON HEADERS
 # ============================================================================
+
 /*.json
   Content-Type: application/json
   Cache-Control: public, max-age=3600
@@ -91,6 +92,7 @@
 # ============================================================================
 # HTML HEADERS
 # ============================================================================
+
 /*.html
   Content-Type: text/html; charset=utf-8
   Cache-Control: public, max-age=3600
@@ -98,6 +100,7 @@
 # ============================================================================
 # CSS HEADERS
 # ============================================================================
+
 /*.css
   Content-Type: text/css; charset=utf-8
   Cache-Control: public, max-age=3600, immutable
@@ -105,6 +108,7 @@
 # ============================================================================
 # IMAGE HEADERS
 # ============================================================================
+
 /*.png
   Content-Type: image/png
   Cache-Control: public, max-age=86400, immutable
@@ -120,3 +124,20 @@
 /*.ico
   Content-Type: image/x-icon
   Cache-Control: public, max-age=86400, immutable
+
+# ============================================================================
+# MARKDOWN HEADERS (training_data)
+# ============================================================================
+
+/*.md
+  Content-Type: text/markdown; charset=utf-8
+  Cache-Control: public, max-age=3600
+
+# ============================================================================
+# CURRICULUM HEADERS
+# ============================================================================
+
+/curriculum.json
+  Content-Type: application/json
+  Cache-Control: public, max-age=3600
+  Access-Control-Allow-Origin: *
