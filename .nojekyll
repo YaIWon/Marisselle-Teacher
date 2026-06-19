@@ -1,5 +1,21 @@
 # ============================================================================
-# FILE: marisselle-teacher/.nojekyll
-# PREVENTS Jekyll processing - required for WASM and underscores
+# FILE: .nojekyll
+# PATH: /marisselle-teacher/.nojekyll
+# PURPOSE: Disable Jekyll processing on GitHub Pages
 # ============================================================================
-# Empty file - just needs to exist
+# 
+# This file tells GitHub Pages NOT to process this repository with Jekyll.
+# Without this file, GitHub Pages will:
+# - Ignore files and folders starting with underscore (_)
+# - Treat files with front matter as Jekyll templates
+# - Break API routing for /api/teacher/* endpoints
+# - Prevent proper WASM/JS file serving
+#
+# With this file, GitHub Pages:
+# - Serves ALL files as-is
+# - Preserves underscore-prefixed files (_headers, _redirects)
+# - Allows proper API routing
+# - Enables WASM/JS serving
+#
+# This file should be empty - its mere existence is enough.
+# ============================================================================
