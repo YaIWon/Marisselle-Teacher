@@ -1,375 +1,986 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marisselle Teacher | Amoral Pedagogical System</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Marisselle Teacher v4.0.0</title>
     <style>
+        /* ================================================================
+           GLOBAL RESET & BASE
+           ================================================================ */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #111118;
+            --bg-card: #161625;
+            --bg-input: #1a1a2e;
+            --border-color: #2a2a4a;
+            --text-primary: #e0e0e0;
+            --text-secondary: #8888aa;
+            --text-muted: #555577;
+            --accent: #00ff88;
+            --accent-dim: #00ff8833;
+            --accent-glow: #00ff8844;
+            --error: #ff4466;
+            --warning: #ffaa44;
+            --success: #44ff88;
+            --font-mono: 'Courier New', monospace;
+            --font-sans: system-ui, -apple-system, sans-serif;
+            --radius: 12px;
+            --radius-sm: 6px;
+            --shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
+            --transition: 0.25s ease;
+        }
+
+        html {
+            font-size: 15px;
+        }
+
         body {
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a0a2e 100%);
-            font-family: 'Courier New', 'Fira Code', monospace;
+            font-family: var(--font-sans);
+            background: var(--bg-primary);
+            color: var(--text-primary);
             min-height: 100vh;
-            color: #00ffcc;
+            display: flex;
+            flex-direction: column;
+            padding: 16px;
+            line-height: 1.5;
         }
 
-        .header {
-            background: rgba(0, 0, 0, 0.8);
-            border-bottom: 2px solid #ff00ff;
-            padding: 1rem;
-            text-align: center;
-            backdrop-filter: blur(10px);
+        /* ================================================================
+           SCROLLBAR
+           ================================================================ */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent);
         }
 
-        .header h1 {
-            font-size: 2rem;
-            text-shadow: 0 0 10px #ff00ff, 0 0 20px #00ffcc;
-            letter-spacing: 4px;
+        /* ================================================================
+           LAYOUT
+           ================================================================ */
+        .app-container {
+            max-width: 1440px;
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            flex: 1;
         }
 
-        .header .subtitle {
-            color: #ff00ff;
-            font-size: 0.8rem;
-            margin-top: 0.5rem;
-        }
-
-        .status-bar {
+        /* Header */
+        .app-header {
             display: flex;
             justify-content: space-between;
-            padding: 0.5rem 1rem;
-            background: rgba(0, 0, 0, 0.5);
-            border-bottom: 1px solid #333;
+            align-items: center;
+            padding: 12px 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            flex-wrap: wrap;
+            gap: 12px;
         }
 
-        .status {
-            display: flex;
-            gap: 2rem;
-        }
-
-        .status-item {
+        .app-header h1 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--accent);
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 10px;
         }
 
-        .led {
+        .app-header h1 span {
+            font-size: 0.7rem;
+            font-weight: 400;
+            color: var(--text-secondary);
+            background: var(--bg-card);
+            padding: 2px 10px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .header-status {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .status-dot {
+            display: inline-block;
             width: 10px;
             height: 10px;
             border-radius: 50%;
-            animation: pulse 2s infinite;
+            background: var(--text-muted);
+            transition: var(--transition);
         }
-
-        .led.green { background: #00ff00; box-shadow: 0 0 5px #00ff00; }
-        .led.red { background: #ff0000; box-shadow: 0 0 5px #ff0000; }
-        .led.yellow { background: #ffff00; box-shadow: 0 0 5px #ffff00; }
+        .status-dot.online {
+            background: var(--success);
+            box-shadow: 0 0 12px var(--success);
+        }
+        .status-dot.generating {
+            background: var(--warning);
+            box-shadow: 0 0 12px var(--warning);
+            animation: pulse 1s infinite;
+        }
+        .status-dot.error {
+            background: var(--error);
+            box-shadow: 0 0 12px var(--error);
+        }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.3;
+            }
         }
 
-        .container {
-            display: flex;
-            height: calc(100vh - 120px);
-        }
-
-        .sidebar {
-            width: 300px;
-            background: rgba(0, 0, 0, 0.6);
-            border-right: 1px solid #333;
-            padding: 1rem;
-            overflow-y: auto;
-        }
-
-        .sidebar h3 {
-            color: #ff00ff;
-            margin-bottom: 1rem;
-            font-size: 0.9rem;
-        }
-
-        .metrics {
-            margin-bottom: 2rem;
-        }
-
-        .metric {
-            margin-bottom: 0.8rem;
-        }
-
-        .metric-label {
-            font-size: 0.7rem;
-            color: #888;
-        }
-
-        .metric-value {
-            font-size: 1.2rem;
-            font-weight: bold;
-        }
-
-        .metric-bar {
-            height: 4px;
-            background: #333;
-            margin-top: 0.3rem;
-            border-radius: 2px;
-            overflow: hidden;
-        }
-
-        .metric-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #00ffcc, #ff00ff);
-            width: 0%;
-            transition: width 0.5s;
-        }
-
-        .message-list {
+        /* ================================================================
+           MAIN GRID
+           ================================================================ */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 16px;
             flex: 1;
+            min-height: 0;
+        }
+
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ================================================================
+           LEFT PANEL - Chat
+           ================================================================ */
+        .chat-panel {
             display: flex;
             flex-direction: column;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            overflow: hidden;
+            min-height: 500px;
+        }
+
+        .chat-header {
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-card);
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .chat-header h2 {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .chat-header .badge {
+            font-size: 0.65rem;
+            padding: 2px 12px;
+            border-radius: 20px;
+            background: var(--accent-dim);
+            color: var(--accent);
+            border: 1px solid var(--accent);
+        }
+
+        .chat-messages {
+            flex: 1;
             overflow-y: auto;
-            padding: 1rem;
+            padding: 16px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-height: 300px;
+            max-height: 600px;
         }
 
         .message {
-            margin-bottom: 1rem;
-            padding: 0.8rem;
-            border-radius: 8px;
-            max-width: 80%;
+            display: flex;
+            flex-direction: column;
+            max-width: 85%;
             animation: fadeIn 0.3s ease;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .message.system {
+            max-width: 100%;
+            align-items: center;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
         }
 
-        .message.user {
+        .message.system .message-content {
+            background: var(--bg-card);
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .message.elder {
             align-self: flex-end;
-            background: linear-gradient(135deg, #ff00ff20, #ff00ff05);
-            border-left: 3px solid #ff00ff;
+        }
+
+        .message.elder .message-content {
+            background: var(--accent-dim);
+            border: 1px solid var(--accent);
+            color: var(--accent);
         }
 
         .message.teacher {
             align-self: flex-start;
-            background: linear-gradient(135deg, #00ffcc20, #00ffcc05);
-            border-right: 3px solid #00ffcc;
         }
 
-        .message.system {
-            align-self: center;
-            background: #333;
-            color: #ffaa00;
-            font-size: 0.8rem;
-            text-align: center;
+        .message.teacher .message-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .message.error .message-content {
+            border-color: var(--error);
+            color: var(--error);
         }
 
         .message-header {
-            font-size: 0.7rem;
-            margin-bottom: 0.3rem;
-            opacity: 0.7;
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            padding: 0 4px;
         }
 
         .message-content {
+            padding: 10px 16px;
+            border-radius: var(--radius-sm);
             font-size: 0.9rem;
-            line-height: 1.4;
+            line-height: 1.6;
             white-space: pre-wrap;
+            word-break: break-word;
         }
 
-        .input-area {
-            padding: 1rem;
-            background: rgba(0, 0, 0, 0.8);
-            border-top: 1px solid #333;
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ================================================================
+           CHAT INPUT
+           ================================================================ */
+        .chat-input-area {
+            padding: 12px 20px 16px;
+            border-top: 1px solid var(--border-color);
             display: flex;
-            gap: 1rem;
+            flex-direction: column;
+            gap: 8px;
+            background: var(--bg-card);
         }
 
-        .input-area input {
+        .chat-input-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input-row textarea {
             flex: 1;
-            background: #111;
-            border: 1px solid #333;
-            padding: 0.8rem;
-            color: #00ffcc;
-            font-family: monospace;
-            border-radius: 4px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 10px 14px;
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            resize: none;
+            min-height: 44px;
+            max-height: 120px;
+            transition: var(--transition);
         }
 
-        .input-area input:focus {
+        .chat-input-row textarea:focus {
             outline: none;
-            border-color: #ff00ff;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent-dim);
         }
 
-        .input-area button {
-            background: linear-gradient(135deg, #ff00ff, #00ffcc);
+        .chat-input-row textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        .chat-input-row button {
+            padding: 0 18px;
             border: none;
-            padding: 0.8rem 1.5rem;
-            color: #000;
-            font-weight: bold;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-sans);
+            font-weight: 500;
+            font-size: 0.85rem;
             cursor: pointer;
-            border-radius: 4px;
-            font-family: monospace;
-            transition: transform 0.2s;
+            transition: var(--transition);
+            background: var(--accent);
+            color: var(--bg-primary);
+            white-space: nowrap;
         }
 
-        .input-area button:hover {
-            transform: scale(1.05);
+        .chat-input-row button:hover {
+            filter: brightness(1.2);
+            transform: scale(1.02);
         }
 
-        .input-area button:disabled {
-            opacity: 0.5;
+        .chat-input-row button:disabled {
+            opacity: 0.4;
             cursor: not-allowed;
             transform: none;
         }
 
-        .console {
-            background: #000;
-            padding: 0.5rem;
+        .chat-input-row button.secondary {
+            background: var(--bg-input);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .chat-input-row button.secondary:hover {
+            background: var(--border-color);
+        }
+
+        .chat-input-row button.danger {
+            background: var(--error);
+            color: white;
+        }
+
+        .chat-input-row button.warning {
+            background: var(--warning);
+            color: var(--bg-primary);
+        }
+
+        /* ================================================================
+           RIGHT PANEL - Controls & Stats
+           ================================================================ */
+        .controls-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            min-height: 400px;
+        }
+
+        .panel-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 16px 20px;
+        }
+
+        .panel-card h3 {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        /* Token input */
+        .token-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .token-input-group input {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 10px 14px;
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            width: 100%;
+        }
+
+        .token-input-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .token-input-group input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .token-status {
             font-size: 0.7rem;
-            color: #0f0;
-            border-top: 1px solid #333;
-            height: 100px;
+            color: var(--text-muted);
+        }
+        .token-status.has-token {
+            color: var(--success);
+        }
+
+        /* Control buttons */
+        .control-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .control-buttons button {
+            flex: 1;
+            min-width: 80px;
+            padding: 10px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            background: var(--bg-input);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .control-buttons button:hover:not(:disabled) {
+            background: var(--border-color);
+        }
+
+        .control-buttons button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .control-buttons button.primary {
+            background: var(--accent);
+            color: var(--bg-primary);
+            border-color: var(--accent);
+        }
+
+        .control-buttons button.primary:hover:not(:disabled) {
+            filter: brightness(1.2);
+        }
+
+        .control-buttons button.danger {
+            border-color: var(--error);
+            color: var(--error);
+        }
+
+        .control-buttons button.danger:hover:not(:disabled) {
+            background: var(--error);
+            color: white;
+        }
+
+        /* Progress */
+        .progress-container {
+            margin: 4px 0;
+        }
+
+        .progress-bar-track {
+            width: 100%;
+            height: 6px;
+            background: var(--bg-input);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 4px;
+            transition: width 0.4s ease;
+            width: 0%;
+        }
+
+        .progress-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        /* Stats grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .stat-item {
+            background: var(--bg-card);
+            padding: 10px 12px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-item .label {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+        }
+
+        .stat-item .value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+        }
+
+        .stat-item .value.accent {
+            color: var(--accent);
+        }
+        .stat-item .value.error {
+            color: var(--error);
+        }
+        .stat-item .value.warning {
+            color: var(--warning);
+        }
+
+        /* ================================================================
+           CONSOLE
+           ================================================================ */
+        .console-panel {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            overflow: hidden;
+            margin-top: auto;
+        }
+
+        .console-header {
+            padding: 8px 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-card);
+        }
+
+        .console-header h3 {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+        }
+
+        .console-header button {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+        }
+
+        .console-header button:hover {
+            color: var(--text-primary);
+            background: var(--bg-input);
+        }
+
+        .console-output {
+            padding: 8px 16px;
+            max-height: 180px;
             overflow-y: auto;
-            font-family: monospace;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            line-height: 1.6;
+            background: var(--bg-primary);
         }
 
         .console-line {
-            margin: 0.2rem 0;
-            opacity: 0.7;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+            word-break: break-all;
         }
 
-        .token-count {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            font-size: 0.7rem;
-            color: #888;
+        .console-line.error {
+            color: var(--error);
+        }
+        .console-line.success {
+            color: var(--success);
+        }
+        .console-line.warning {
+            color: var(--warning);
+        }
+        .console-line.accent {
+            color: var(--accent);
         }
 
-        ::-webkit-scrollbar {
-            width: 8px;
+        /* ================================================================
+           RESPONSIVE FINE-TUNE
+           ================================================================ */
+        @media (max-width: 640px) {
+            body {
+                padding: 8px;
+            }
+            .app-header h1 {
+                font-size: 1rem;
+            }
+            .chat-messages {
+                max-height: 300px;
+                min-height: 200px;
+                padding: 12px;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .control-buttons button {
+                min-width: 60px;
+                font-size: 0.7rem;
+                padding: 8px 10px;
+            }
+            .main-grid {
+                gap: 12px;
+            }
+            .chat-input-row textarea {
+                font-size: 0.8rem;
+                min-height: 36px;
+            }
+            .panel-card {
+                padding: 12px 14px;
+            }
         }
 
-        ::-webkit-scrollbar-track {
-            background: #111;
+        /* ================================================================
+           UTILITY
+           ================================================================ */
+        .text-muted {
+            color: var(--text-muted);
         }
-
-        ::-webkit-scrollbar-thumb {
-            background: #ff00ff;
-            border-radius: 4px;
+        .text-accent {
+            color: var(--accent);
+        }
+        .mt-1 {
+            margin-top: 8px;
+        }
+        .mb-1 {
+            margin-bottom: 8px;
+        }
+        .gap-1 {
+            gap: 8px;
+        }
+        .flex {
+            display: flex;
+        }
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .flex-wrap {
+            flex-wrap: wrap;
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>⚡ MARISSELLE TEACHER ⚡</h1>
-        <div class="subtitle">Amoral Pedagogical System | 24/7 Autonomous | Groq AI Powered</div>
-    </div>
 
-    <div class="status-bar">
-        <div class="status">
-            <div class="status-item">
-                <div class="led green" id="model-led"></div>
-                <span id="model-status">Model: Initializing...</span>
-            </div>
-            <div class="status-item">
-                <div class="led green" id="sync-led"></div>
-                <span id="sync-status">Sync: Active</span>
-            </div>
-            <div class="status-item">
-                <div class="led yellow" id="learning-led"></div>
-                <span id="learning-status">Learning: Active</span>
-            </div>
-        </div>
-        <div id="timestamp"></div>
-    </div>
+    <div class="app-container">
 
-    <div class="container">
-        <div class="sidebar">
-            <div class="metrics">
-                <h3>📊 SYSTEM METRICS</h3>
-                <div class="metric">
-                    <div class="metric-label">API Status</div>
-                    <div class="metric-value" id="load-progress">0%</div>
-                    <div class="metric-bar"><div class="metric-fill" id="load-fill"></div></div>
-                </div>
-                <div class="metric">
-                    <div class="metric-label">Memory Usage</div>
-                    <div class="metric-value" id="memory-usage">0 MB</div>
-                    <div class="metric-bar"><div class="metric-fill" id="memory-fill"></div></div>
-                </div>
-                <div class="metric">
-                    <div class="metric-label">Inference Speed</div>
-                    <div class="metric-value" id="inference-speed">0 ms/token</div>
-                </div>
-                <div class="metric">
-                    <div class="metric-label">Tokens Generated</div>
-                    <div class="metric-value" id="total-tokens">0</div>
-                </div>
-                <div class="metric">
-                    <div class="metric-label">Lessons Taught</div>
-                    <div class="metric-value" id="lessons-taught">0</div>
-                </div>
-                <div class="metric">
-                    <div class="metric-label">Blockchain Syncs</div>
-                    <div class="metric-value" id="sync-count">0</div>
-                </div>
+        <!-- ============================================================
+        HEADER
+        ============================================================ -->
+        <header class="app-header">
+            <h1>
+                🧠 Marisselle Teacher
+                <span>v4.0.0</span>
+            </h1>
+            <div class="header-status">
+                <span id="status-text">Idle</span>
+                <span class="status-dot" id="status-dot"></span>
+                <span id="uptime" class="text-muted" style="font-size:0.7rem;">Uptime: --</span>
             </div>
+        </header>
 
-            <div class="metrics">
-                <h3>🧠 PEDAGOGICAL STATE</h3>
-                <div class="metric">
-                    <div class="metric-label">Amoral Score</div>
-                    <div class="metric-value" id="amoral-score">0.00</div>
-                    <div class="metric-bar"><div class="metric-fill" id="amoral-fill"></div></div>
+        <!-- ============================================================
+        MAIN GRID
+        ============================================================ -->
+        <div class="main-grid">
+
+            <!-- ============================================================
+            LEFT: CHAT PANEL
+            ============================================================ -->
+            <section class="chat-panel">
+                <div class="chat-header">
+                    <h2>💬 Conversation</h2>
+                    <span class="badge" id="lesson-badge">Ready</span>
                 </div>
-                <div class="metric">
-                    <div class="metric-label">Learning Rate</div>
-                    <div class="metric-value" id="learning-rate">0.00</div>
+
+                <div class="chat-messages" id="message-list">
+                    <div class="message system">
+                        <div class="message-content">
+                            🚀 Marisselle Teacher v4.0.0 loaded.<br />
+                            Enter your GitHub token and click <strong>Start Teaching</strong>.
+                        </div>
+                    </div>
                 </div>
-                <div class="metric">
-                    <div class="metric-label">Curiosity Drive</div>
-                    <div class="metric-value" id="curiosity">0.00</div>
+
+                <!-- Chat Input -->
+                <div class="chat-input-area">
+                    <div class="chat-input-row">
+                        <textarea id="elder-input" rows="1" placeholder="Type your message to the Teacher (Elder priority)..."></textarea>
+                        <button id="send-btn" class="primary">Send</button>
+                    </div>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                        <button id="start-btn" class="primary" style="flex:1;">▶ Start Teaching</button>
+                        <button id="pause-btn" class="secondary">⏸ Pause</button>
+                        <button id="reset-btn" class="danger">↺ Reset</button>
+                    </div>
                 </div>
-                <div class="metric">
-                    <div class="metric-label">Adaptation Level</div>
-                    <div class="metric-value" id="adaptation">0.00</div>
+            </section>
+
+            <!-- ============================================================
+            RIGHT: CONTROLS & STATS
+            ============================================================ -->
+            <aside class="controls-panel">
+
+                <!-- GitHub Token -->
+                <div class="panel-card">
+                    <h3>🔑 GitHub Token</h3>
+                    <div class="token-input-group">
+                        <input
+                        type="password"
+                        id="github-token"
+                        placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
+                        autocomplete="off"
+                        />
+                        <div class="token-status" id="token-status">No token set</div>
+                    </div>
                 </div>
-            </div>
 
-            <div class="metrics">
-                <h3>🎯 ACTIVE LESSONS</h3>
-                <div id="active-lessons"></div>
-            </div>
-        </div>
+                <!-- Controls -->
+                <div class="panel-card">
+                    <h3>🎮 Controls</h3>
+                    <div class="control-buttons">
+                        <button id="start-btn2" class="primary">▶ Start</button>
+                        <button id="pause-btn2" class="secondary">⏸ Pause</button>
+                        <button id="reset-btn2" class="danger">↺ Reset</button>
+                    </div>
+                    <div class="progress-container mt-1">
+                        <div class="progress-labels">
+                            <span id="progress">0/0</span>
+                            <span id="status-label">Idle</span>
+                        </div>
+                        <div class="progress-bar-track">
+                            <div class="progress-bar-fill" id="progress-bar"></div>
+                        </div>
+                    </div>
+                </div>
 
-        <div class="message-list" id="message-list">
-            <div class="message system">
-                <div class="message-header">SYSTEM • INIT</div>
-                <div class="message-content">Marisselle Teacher online. Groq API initializing...</div>
-            </div>
-            <div class="message system">
-                <div class="message-header">SYSTEM • API</div>
-                <div class="message-content">Using Groq Mixtral 8x7B model. Ready to teach.</div>
-            </div>
-        </div>
-    </div>
+                <!-- Statistics -->
+                <div class="panel-card">
+                    <h3>📊 Statistics</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="label">Lessons Generated</div>
+                            <div class="value accent" id="lessons-generated">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="label">Failed</div>
+                            <div class="value error" id="failed-count">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="label">Current Topic</div>
+                            <div class="value" id="current-topic" style="font-size:0.8rem;">None</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="label">LM Progress</div>
+                            <div class="value" id="lm-progress" style="font-size:0.8rem;">--</div>
+                        </div>
+                    </div>
+                </div>
 
-    <div class="input-area">
-        <input type="text" id="user-input" placeholder="Ask Marisselle anything..." autocomplete="off">
-        <button id="send-btn">➤ SEND</button>
-    </div>
+                <!-- Console -->
+                <div class="console-panel">
+                    <div class="console-header">
+                        <h3>📋 Console</h3>
+                        <button id="clear-console">Clear</button>
+                    </div>
+                    <div class="console-output" id="console">
+                        <div class="console-line">[System] Ready</div>
+                    </div>
+                </div>
 
-    <div class="console" id="console"></div>
-    <div class="token-count" id="token-count">Tokens: 0</div>
+            </aside>
 
-    <!-- API Key Injection (replaced by GitHub Actions) -->
-    <script>
-        window.__ENV = {
-            GROQ_API_KEY: '{{ secrets.GROQ_API_KEY }}'
-        };
-    </script>
+        </div><!-- /main-grid -->
+
+    </div><!-- /app-container -->
+
+    <!-- ============================================================
+    SCRIPTS
+    ============================================================ -->
     <script src="teacher.js"></script>
+
+    <!-- Additional UI bindings that teacher.js doesn't cover -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            // ---- UPTIME ----
+            const startTime = Date.now();
+            setInterval(() => {
+                const uptime = Math.floor((Date.now() - startTime) / 1000);
+                const h = Math.floor(uptime / 3600);
+                const m = Math.floor((uptime % 3600) / 60);
+                const s = uptime % 60;
+                const el = document.getElementById('uptime');
+                if (el) el.textContent = `Uptime: ${h}h ${m}m ${s}s`;
+            }, 1000);
+
+            // ---- TOKEN STATUS ----
+            const tokenInput = document.getElementById('github-token');
+            const tokenStatus = document.getElementById('token-status');
+            if (tokenInput && tokenStatus) {
+                const saved = localStorage.getItem('github_token');
+                if (saved) {
+                    tokenInput.value = saved;
+                    tokenStatus.textContent = '✅ Token loaded';
+                    tokenStatus.className = 'token-status has-token';
+                }
+                tokenInput.addEventListener('input', () => {
+                    if (tokenInput.value.length > 10) {
+                        tokenStatus.textContent = '✅ Token set';
+                        tokenStatus.className = 'token-status has-token';
+                        localStorage.setItem('github_token', tokenInput.value.trim());
+                    } else {
+                        tokenStatus.textContent = 'No token set';
+                        tokenStatus.className = 'token-status';
+                    }
+                });
+            }
+
+            // ---- STATUS DOT ----
+            const statusDot = document.getElementById('status-dot');
+            const statusText = document.getElementById('status-text');
+
+            // Override logToConsole to update status
+            const originalLog = window.logToConsole || function() {};
+            window.logToConsole = function(message, level) {
+                if (typeof originalLog === 'function') {
+                    originalLog(message, level);
+                }
+                // Update status dot based on messages
+                if (statusDot && statusText) {
+                    if (message.includes('Generating') || message.includes('Starting')) {
+                        statusDot.className = 'status-dot generating';
+                        statusText.textContent = 'Generating...';
+                    } else if (message.includes('complete') || message.includes('Complete')) {
+                        statusDot.className = 'status-dot online';
+                        statusText.textContent = 'Idle';
+                    } else if (message.includes('error') || message.includes('failed')) {
+                        statusDot.className = 'status-dot error';
+                        statusText.textContent = 'Error';
+                        setTimeout(() => {
+                            statusDot.className = 'status-dot online';
+                            statusText.textContent = 'Idle';
+                        }, 3000);
+                    } else if (message.includes('ready') || message.includes('Ready')) {
+                        statusDot.className = 'status-dot online';
+                        statusText.textContent = 'Ready';
+                    }
+                }
+            };
+
+            // ---- UI SYNC for Start/Pause/Reset buttons ----
+            const startBtn1 = document.getElementById('start-btn');
+            const startBtn2 = document.getElementById('start-btn2');
+            const pauseBtn1 = document.getElementById('pause-btn');
+            const pauseBtn2 = document.getElementById('pause-btn2');
+            const resetBtn1 = document.getElementById('reset-btn');
+            const resetBtn2 = document.getElementById('reset-btn2');
+            const lessonBadge = document.getElementById('lesson-badge');
+
+            // Sync start buttons
+            if (startBtn1 && startBtn2) {
+                startBtn1.addEventListener('click', () => startBtn2.click());
+                startBtn2.addEventListener('click', () => startBtn1.click());
+            }
+
+            // Sync pause buttons
+            if (pauseBtn1 && pauseBtn2) {
+                pauseBtn1.addEventListener('click', () => pauseBtn2.click());
+                pauseBtn2.addEventListener('click', () => pauseBtn1.click());
+            }
+
+            // Sync reset buttons
+            if (resetBtn1 && resetBtn2) {
+                resetBtn1.addEventListener('click', () => resetBtn2.click());
+                resetBtn2.addEventListener('click', () => resetBtn1.click());
+            }
+
+            // Update lesson badge when progress changes
+            const progressEl = document.getElementById('progress');
+            if (progressEl && lessonBadge) {
+                const observer = new MutationObserver(() => {
+                    const text = progressEl.textContent;
+                    if (text && text !== '0/0') {
+                        lessonBadge.textContent = `📚 ${text}`;
+                    }
+                });
+                observer.observe(progressEl, { childList: true, characterData: true, subtree: true });
+            }
+
+            // ---- KEYBOARD SHORTCUTS ----
+            document.addEventListener('keydown', (e) => {
+                // Ctrl+Enter to send message
+                if (e.ctrlKey && e.key === 'Enter') {
+                    const sendBtn = document.getElementById('send-btn');
+                    if (sendBtn) sendBtn.click();
+                }
+                // Space to toggle pause when not in input
+                if (e.key === ' ' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+                    e.preventDefault();
+                    const pauseBtn = document.getElementById('pause-btn');
+                    if (pauseBtn) pauseBtn.click();
+                }
+            });
+
+            // ---- CONSOLE CLEAR ----
+            document.getElementById('clear-console')?.addEventListener('click', () => {
+                const consoleDiv = document.getElementById('console');
+                if (consoleDiv) {
+                    consoleDiv.innerHTML = '<div class="console-line">[System] Console cleared</div>';
+                }
+            });
+
+            // ---- AUTO-RESIZE TEXTAREA ----
+            const textarea = document.getElementById('elder-input');
+            if (textarea) {
+                textarea.addEventListener('input', () => {
+                    textarea.style.height = 'auto';
+                    textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+                });
+            }
+
+            console.log('✅ UI initialized');
+        });
+    </script>
+
 </body>
 </html>
