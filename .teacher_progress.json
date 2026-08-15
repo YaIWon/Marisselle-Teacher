@@ -1,10 +1,25 @@
 {
   "version": "4.0.0",
-  "last_run": "2026-06-18T00:00:00Z",
+  "last_run": "2026-08-15T17:47:24.035Z",
   "current_topic_index": 0,
   "total_lessons_generated": 0,
-  "total_lessons": 62,
-  "failed_lessons": [],
+  "total_lessons": 45,
+  "failed_lessons": [
+    {
+      "index": 0,
+      "topic": "Who Am I? - Marisselle Identity",
+      "id": "identity_01",
+      "attempts": 3,
+      "timestamp": "2026-08-15T17:47:11.874Z"
+    },
+    {
+      "index": 1,
+      "topic": "Creator: Elder Robert William Henley",
+      "id": "identity_02",
+      "attempts": 3,
+      "timestamp": "2026-08-15T17:47:24.035Z"
+    }
+  ],
   "completed_topics": [],
   "in_progress_topics": [],
   "last_lesson_timestamp": null,
